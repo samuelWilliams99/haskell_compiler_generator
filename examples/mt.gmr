@@ -1,0 +1,65 @@
+%export { ASTCommand (..), ASTExpr (..), ASTDecl (..) }
+%precode {
+data ASTCommand = ASTAssign String ASTExpr
+                | ASTCall String [ASTExpr]
+                | ASTIf ASTExpr ASTCommand ASTCommand
+                | ASTWhile ASTExpr ASTCommand
+                | ASTLet [ASTDecl] ASTCommand
+                | ASTSeq [ASTCommand]
+                | ASTPass
+
+data ASTExpr = ASTExprBinOp String ASTExpr ASTExpr
+             | ASTExprInt Int
+             | ASTExprBool Bool
+             | ASTExprVar String
+             | ASTExprUnOp String ASTExpr
+
+data ASTDecl = ASTDeclConst String ASTExpr
+             | ASTDeclVar String (Maybe ASTExpr)
+
+unwrapOp :: TokenType -> String
+unwrapOp (TokenOperator s) = s
+}
+%operators "^" "*" "/" "+" "-" "<" "<=" "==" "!=" ">=" ">" "&&" "||" "!" "," ";" ":" ":=" "="
+%keywords "begin" "const" "do" "else" "end" "if" "in" "let" "then" "var" "while" "true" "false" "pass"
+%linecomments "//"
+
+%right "^"
+%left "*" "/"
+%left "+" "-"
+%left "<" "<=" "==" "!=" ">=" ">"
+%left "&&"
+%left "||"
+
+Command :: identifier ":=" Expression                         { ASTAssign v1 v3 }
+         | identifier "(" Expression+(",") ")"                { ASTCall v1 v3 }
+         | if Expression then Command else Command            { ASTIf v2 v4 v6 }
+         | while Expression do Command                        { ASTWhile v2 v4 }
+         | let Declaration+(";") in Command                   { ASTLet v2 v4 }
+         | begin Command+(";") end                            { ASTSeq v2 }
+         | pass                                               { ASTPass }
+
+Expression :: PrimaryExpression                               { v1 }
+            | Expression "^" Expression                       { ASTExprBinOp "^" v1 v3 }
+            | Expression BinOp2 Expression %prec "*"          { ASTExprBinOp (unwrapOp v2) v1 v3 }
+            | Expression BinOp3 Expression %prec "+"          { ASTExprBinOp (unwrapOp v2) v1 v3 }
+            | Expression BinOp4 Expression %prec "<"          { ASTExprBinOp (unwrapOp v2) v1 v3 }
+            | Expression "&&" Expression                      { ASTExprBinOp "&&" v1 v3 }
+            | Expression "||" Expression                      { ASTExprBinOp "||" v1 v3 }
+
+BinOp2 :: "*" { v1 } | "/" { v1 }
+BinOp3 :: "+" { v1 } | "-" { v1 }
+BinOp4 :: "<" { v1 } | "<=" { v1 } | "==" { v1 } | "!=" { v1 } | ">=" { v1 } | ">" { v1 }
+
+PrimaryExpression :: integerLit                               { ASTExprInt v1 }
+                   | identifier                               { ASTExprVar v1 }
+                   | true                                     { ASTExprBool True }
+                   | false                                    { ASTExprBool False }
+                   | UnOp PrimaryExpression                   { ASTExprUnOp (unwrapOp v1) v2 }
+                   | "(" Expression ")"                       { v2 }
+
+UnOp :: "-" { v1 } | "!" { v1 }
+
+Declaration :: const identifier "=" Expression { ASTDeclConst v2 v4 }
+             | var identifier                  { ASTDeclVar v2 Nothing }
+             | var identifier ":=" Expression  { ASTDeclVar v2 $ Just v4 }
