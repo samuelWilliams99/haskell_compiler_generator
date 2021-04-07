@@ -1,20 +1,24 @@
 module Semantics where
 
 import Control.Lens
+import Data.HashMap.Strict
 
 data SemanticsDef =
     SemanticsDef{ _semanticsPreCode :: String
-                , _semanticsBaseTypes :: [String]
-                , _semanticsState :: (String, String)
+                , _semanticsBaseTypes :: HashMap String String
+                , _semanticsParamTypes :: HashMap String String
+                , _semanticsStateExtra :: (String, String)
+                , _semanticsVarExtra :: (String, String)
                 , _semanticsRules :: [SemanticsRule]
                 , _semanticsAstTypes :: [String]
                 } deriving Show
 
-data SemanticsType = SemanticsCommandType | SemanticsBaseType String | SemanticsVarType String
+data SemanticsType = SemanticsCommandType | SemanticsStaticType String | SemanticsStaticBaseType String | SemanticsVarType String
 
 instance Show SemanticsType where
-    show SemanticsCommandType = show "%command"
-    show (SemanticsBaseType s) = show s
+    show SemanticsCommandType = "BaseType " ++ show "%command"
+    show (SemanticsStaticBaseType s) = "BaseType " ++ show s
+    show (SemanticsStaticType s) = show s
     show (SemanticsVarType s) = s
 
 data SemanticsRule =

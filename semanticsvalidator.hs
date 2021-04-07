@@ -4,10 +4,11 @@ import ParserRequirements
 import Semantics
 import Data.List
 import Control.Lens
+import Data.HashMap.Strict
 
 validateSemantics :: SemanticsDef -> Result SemanticsDef
 validateSemantics def = do
-    newRules <- mapM (validateRuleTypes $ _semanticsBaseTypes def) (_semanticsRules def)
+    newRules <- mapM (validateRuleTypes $ keys (_semanticsBaseTypes def)) (_semanticsRules def)
 
     return $ def{ _semanticsRules=newRules }
 
@@ -15,15 +16,17 @@ isVarType :: SemanticsDepOutputType -> Bool
 isVarType (RawSemanticsDepType (SemanticsVarType _)) = True
 isVarType _ = False
 
-getVarStr :: SemanticsDepOutputType -> String
-getVarStr (RawSemanticsDepType (SemanticsVarType s)) = s
-getVarStr (RawSemanticsDepType (SemanticsBaseType s)) = s
-getVarStr (RawSemanticsDepType SemanticsCommandType) = "%command"
+getVarStr :: SemanticsType -> String
+getVarStr (SemanticsVarType s) = s
+getVarStr (SemanticsStaticType s) = s
+getVarStr (SemanticsStaticBaseType s) = s
+getVarStr SemanticsCommandType = "%command"
 
-validateBasevars :: [String] -> SemanticsRuleDependency -> Result SemanticsRuleDependency
-validateBasevars baseTypes dep = let name = getVarStr $ _semanticsDepOutputType dep in
-                                 if elem name baseTypes then
-                                     return $ dep { _semanticsDepOutputType=BuiltSemanticsDepTypeCompare $ SemanticsBaseType name }
+validateBaseVars :: [String] -> SemanticsRuleDependency -> Result SemanticsRuleDependency
+validateBaseVars baseTypes dep = let (RawSemanticsDepType v) = _semanticsDepOutputType dep
+                                     name = getVarStr v
+                                 in if elem name baseTypes then
+                                     return $ dep { _semanticsDepOutputType=BuiltSemanticsDepTypeCompare v }
                                  else Error $ "Base type " ++ name ++ " is invalid"
 
 validateTypeVars :: [String] -> [SemanticsRuleDependency] -> [SemanticsRuleDependency]
@@ -41,7 +44,7 @@ validateRuleTypes baseTypes rule = do
     let deps = _semanticsRuleDeps rule
     let (varTypeDeps, baseTypeDeps) = partition (isVarType . _semanticsDepOutputType) deps
 
-    newBaseTypeDeps <- mapM (validateBasevars $ "%command":baseTypes) baseTypeDeps
+    newBaseTypeDeps <- mapM (validateBaseVars $ "%command":baseTypes) baseTypeDeps
 
     let newVarTypeDeps = validateTypeVars [] varTypeDeps
 

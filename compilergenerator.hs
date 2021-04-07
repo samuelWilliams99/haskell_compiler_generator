@@ -18,6 +18,15 @@ import MainCodeGenerator
 --     some languages separate vars and funcs, some dont, some way of generalising this concept
 -- support parameterised types, like arrays, allow the user to choose the type of types, default is String
 --     will need to change grammar to like this
+
+-- make way to set standard env
+--     probably some function to add functions lol
+--     prob need to add a preCode thing to persistent env
+--     then add the wacky fukin function def shit to it
+--     idfk
+
+
+
 -- error source poses would be nice
 -- something for includes?
 -- presets for code gen, user shouldnt need to know C

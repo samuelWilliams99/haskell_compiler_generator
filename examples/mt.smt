@@ -1,42 +1,34 @@
 %extension mt
 %precode {
-import Data.HashMap.Strict hiding (map)
-import Data.List
-import Control.Lens
-import MtStandardEnv
+makeDefined :: Var -> VolatileState -> VolatileState
+makeDefined v = modifyVar v $ varExtra . _1 .~ True
 
-getVar :: String -> MTState -> Maybe MTVar
-getVar name env = env ^? vars . at name . _Just . _head
+preCode :: String
+preCode = unlines [
+    "#include <stdio.h>",
+    "void printInt(int x) { printf(\"%d\\n\", x); }"
+    ]
 
-getFunc :: String -> [String] -> MTState -> Maybe MTFunc
-getFunc name args env = env ^. funcs . at (name, args)
+_defined :: Var -> Bool
+_defined v = fst (_varExtra v)
 
-standardState :: MTState
-standardState = MTState empty 0 mtStandardEnv
-
-makeDefined :: String -> MTState -> MTState
-makeDefined name = vars . at name . _Just . _head . defined .~ True
-
-addVar :: String -> Bool -> Bool -> MTState -> StateResult (String, MTState)
-addVar name defined const env = do
-    newName <- getNewName
-    let newVar = MTVar name newName defined (env ^. currentScope) const
-    return (newName, over vars (insertWith (++) name [newVar]) env)
+_const :: Var -> Bool
+_const v = snd (_varExtra v)
 }
 %outputprecode preCode
-%basetypes int boolean
-%state MTState standardState
+%basetype int "int"
+%basetype boolean "int"
+%varextra { (Bool, Bool) } { (True, False) }
 
 %asttype ASTExpr
 
-case { ASTExprBinOp op x1 x2 } -> { "(" ++ x1s ++ ") " ++ fName funcData ++ " (" ++ x2s ++ ")" } @ rType
+case { ASTExprBinOp op x1 x2 } -> { "(" ++ x1s ++ ") " ++ fName ++ " (" ++ x2s ++ ")" } @ rType
     evaluating
         x1 -> x1s @ t1
         x2 -> x2s @ t2
     where
         {
-            funcData <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ t1 ++ " and " ++ t2) $ getFunc op [t1, t2] env
-            let rType = retType funcData
+            (rType, fName) <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ show t1 ++ " and " ++ show t2) $ getOp op [t1, t2] env
         }
 
 case { ASTExprInt x } -> { show x } @ "int"
@@ -67,15 +59,15 @@ case { ASTAssign name x } => { (_cName var ++ " = " ++ xs ++ ";", env') }
         {
             var <- forceMaybe ("No such variable " ++ name) $ getVar name env
             require "Cannot assign to a constant variable" $ not $ _const var
-            let env' = if not $ _defined var then makeDefined name env else env
+            let env' = if not $ _defined var then makeDefined var env else env
         }
 
-case { ASTCall name args } -> { fName funcData ++ "(" ++ intercalate ", " argsS ++ ");" }
+case { ASTCall name args } -> { fName ++ "(" ++ intercalate ", " argsS ++ ");" }
     evaluating
         args *-> argsS @ types
     where
         {
-            funcData <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " types)) $ getFunc name types env
+            (_, fName) <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getFunc name types env
         }
 
 case { ASTIf cond tCmd fCmd } -> { "if( " ++ condS ++ " ){\n" ++ indent tCmdS ++ "\n} else {\n" ++ indent fCmdS ++ "\n}" }
@@ -102,24 +94,24 @@ case { ASTPass } -> { "" }
 
 %asttype ASTDecl
 
-case { ASTDeclConst name val } => { ("int " ++ cName ++ " = " ++ valS ++ ";", env') }
+case { ASTDeclConst name val } => { ("int " ++ _cName var ++ " = " ++ valS ++ ";", env') }
     evaluating
         val -> valS @ "int"
     where
         {
-            (cName, env') <- addVar name True True env
+            (var, env') <- addVar name (True, True) (BaseType "int") env
         }
 
-case { ASTDeclVar name Nothing } => { ("int " ++ cName ++ ";", env') }
+case { ASTDeclVar name Nothing } => { ("int " ++ _cName var ++ ";", env') }
     where
         {
-            (cName, env') <- addVar name False False env
+            (var, env') <- addVar name (False, False) (BaseType "int") env
         }
 
-case { ASTDeclVar name (Just val) } => { ("int " ++ cName ++ " = " ++ valS ++ ";", env') }
+case { ASTDeclVar name (Just val) } => { ("int " ++ _cName var ++ " = " ++ valS ++ ";", env') }
     evaluating
         val -> valS @ "int"
     where
         {
-            (cName, env') <- addVar name True False env
+            (var, env') <- addVar name (True, False) (BaseType "int") env
         }

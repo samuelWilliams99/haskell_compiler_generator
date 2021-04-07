@@ -4,6 +4,7 @@ import Data.Either
 import Data.List
 import Semantics
 import Control.Arrow
+import Data.HashMap.Strict hiding (empty, union)
 
 handleStatements :: [Either SemanticsRule String] -> ([SemanticsRule], [String])
 handleStatements stmts = aux stmts ""
@@ -22,15 +23,18 @@ handleStatements stmts = aux stmts ""
 
 %token
       codeBlock     { TokenCustom "CodeBlock" $$ }
-      state         { TokenCustom "Directive" "state" }
-      baseTypes     { TokenCustom "Directive" "basetypes" }
+      varExtra      { TokenCustom "Directive" "varextra" }
+      stateExtra    { TokenCustom "Directive" "stateextra" }
+      baseType      { TokenCustom "Directive" "basetype" }
+      paramType     { TokenCustom "Directive" "paramtype" }
       astType       { TokenCustom "Directive" "asttype" }
       extension     { TokenCustom "Directive" "extension" }
       precode       { TokenCustom "Directive" "precode" }
       outputprecode { TokenCustom "Directive" "outputprecode" }
 
 SemanticsDef :: Extension PreCode? OutPreCode?
-                BaseTypes StateDef Stmts                         { (v1, v3, uncurry (SemanticsDef (fromMaybe "" v2) v4 v5) $ handleStatements v6) }
+                BaseType+ ParamType*
+                StateExtra VarExtra Stmts                        { (v1, v3, uncurry (SemanticsDef (fromMaybe "" v2) (fromList v4) (fromList v5) v6 v7) $ handleStatements v8) }
 
 Extension :: extension identifier                                { v2 }
 
@@ -41,9 +45,15 @@ OutPreCode :: outputprecode identifier                           { v2 }
 
 CodeBlock :: codeBlock { v1 } | identifier { v1 } | upperIdentifier { v1 }
 
-BaseTypes :: baseTypes identifier+                               { v2 }
+BaseType :: baseType identifier stringLit                        { (v2, v3) }
 
-StateDef :: state CodeBlock CodeBlock                            { (v2, v3) }
+ParamType :: paramType identifier identifier                     { (v2, v3) }
+
+StateExtra :: stateExtra CodeBlock CodeBlock                     { (v2, v3) }
+            | %empty                                             { ("()", "()") }
+
+VarExtra :: varExtra CodeBlock CodeBlock                         { (v2, v3) }
+          | %empty                                               { ("()", "()") }
 
 Stmts :: AstType Stmt+                                           { (Right v1):v2 }
 
@@ -55,7 +65,8 @@ AstType :: astType upperIdentifier                               { v2 }
 Rule :: case codeBlock "->" codeBlock Type Evals Where?          { uncurry (SemanticsRule v2 v4 False v5 "" v7) v6 }
       | case codeBlock "=>" codeBlock Type Evals Where?          { uncurry (SemanticsRule v2 v4 True v5 "" v7) v6 }
 
-Type :: "@" stringLit                                            { SemanticsBaseType v2 }
+Type :: "@" stringLit                                            { SemanticsStaticBaseType v2 }
+      | "@" codeBlock                                            { SemanticsStaticType v2 }
       | "@" identifier                                           { SemanticsVarType v2 }
       | %empty                                                   { SemanticsCommandType }
 
