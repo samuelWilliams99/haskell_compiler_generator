@@ -1,0 +1,77 @@
+%precode {
+import Data.Maybe
+import Data.Either
+import Data.List
+import Semantics
+import Control.Arrow
+
+handleStatements :: [Either SemanticsRule String] -> ([SemanticsRule], [String])
+handleStatements stmts = aux stmts ""
+  where
+    aux [] _ = ([], [])
+    aux ((Left rule):stmts) t = first (rule{ _semanticsRuleAstType=t }:) $ aux stmts t
+    aux ((Right t):stmts) _ = second (union [t]) $ aux stmts t
+}
+
+%operators "->" "=>" "<-" "@" "," "*->" "*=>" "^->" "^=>"
+%keywords "evaluating" "where" "restricting" "to" "case"
+%linecomments "#"
+%blockcomments "#[" "]#"
+%separateidentitycase
+%parsermap { (languageDefsParser:) }
+
+%token
+      codeBlock     { TokenCustom "CodeBlock" $$ }
+      state         { TokenCustom "Directive" "state" }
+      baseTypes     { TokenCustom "Directive" "basetypes" }
+      astType       { TokenCustom "Directive" "asttype" }
+      extension     { TokenCustom "Directive" "extension" }
+      precode       { TokenCustom "Directive" "precode" }
+      outputprecode { TokenCustom "Directive" "outputprecode" }
+
+SemanticsDef :: Extension PreCode? OutPreCode?
+                BaseTypes StateDef Stmts                         { (v1, v3, uncurry (SemanticsDef (fromMaybe "" v2) v4 v5) $ handleStatements v6) }
+
+Extension :: extension identifier                                { v2 }
+
+PreCode :: precode codeBlock                                     { v2 }
+
+OutPreCode :: outputprecode identifier                           { v2 }
+            | outputprecode codeBlock                            { v2 }
+
+CodeBlock :: codeBlock { v1 } | identifier { v1 } | upperIdentifier { v1 }
+
+BaseTypes :: baseTypes identifier+                               { v2 }
+
+StateDef :: state CodeBlock CodeBlock                            { (v2, v3) }
+
+Stmts :: AstType Stmt+                                           { (Right v1):v2 }
+
+Stmt :: Rule                                                     { Left v1 }
+      | AstType                                                  { Right v1 }
+
+AstType :: astType upperIdentifier                               { v2 }
+
+Rule :: case codeBlock "->" codeBlock Type Evals Where?          { uncurry (SemanticsRule v2 v4 False v5 "" v7) v6 }
+      | case codeBlock "=>" codeBlock Type Evals Where?          { uncurry (SemanticsRule v2 v4 True v5 "" v7) v6 }
+
+Type :: "@" stringLit                                            { SemanticsBaseType v2 }
+      | "@" identifier                                           { SemanticsVarType v2 }
+      | %empty                                                   { SemanticsCommandType }
+
+Evals :: evaluating Eval+ Restricts                              { (v2, v3) }
+       | %empty                                                  { ([], []) }
+
+Eval :: identifier "->"  identifier Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False SemanticsDepSingle }
+      | identifier "*->" identifier Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold False) }
+      | identifier "^->" identifier Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold True) }
+      | codeBlock  "=>"  codeBlock  Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  SemanticsDepSingle }
+      | codeBlock  "*=>" codeBlock  Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold False) }
+      | codeBlock  "^=>" codeBlock  Type                         { SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold True) }
+
+Restricts :: restricting Restrict+                               { v2 }
+           | %empty                                              { [] }
+
+Restrict :: identifier to identifier+(',')                       { SemanticsTypeRestriction v1 v3 }
+
+Where :: where codeBlock                                         { v2 }
