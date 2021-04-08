@@ -17,18 +17,18 @@ trim = dropWhileEnd isSpace . dropWhile isSpace
 unindent :: String -> String
 unindent = reindent 0
 
-generateSemanticsCode :: String -> String -> Maybe String -> SemanticsDef -> String
-generateSemanticsCode name parserName outPreCode
-    (SemanticsDef preCode baseTypes paramTypes stateExtra varExtra rules astTypes) =
+generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> SemanticsDef -> String
+generateSemanticsCode name parserName preCode outPreCode
+    (SemanticsDef baseTypes paramTypes stateExtra varExtra stateDef rules astTypes) =
     intercalate "\n\n"
         [ generateModuleCode name
         , generateImportsCode parserName
         , generateTypeCode baseTypes paramTypes
         , generateStateTypeCode stateExtra varExtra
-        , unindent preCode
+        , unindent $ fromMaybe "" preCode
         , classCode
         , utilsCode
-        , generateEntryPoint outPreCode
+        , generateEntryPoint outPreCode stateDef
         , generateInstanceCode astTypes
         , generateRulesCode rules
         ]
@@ -44,33 +44,39 @@ generateImportsCode parserName =
     "import Control.Lens\n" ++
     "import ParserRequirements\n" ++
     "import Data.HashMap.Strict\n" ++
-    "import Data.List\n"
+    "import Data.List\n" ++
+    "import Data.Hashable"
 
-generateStateTypeCode :: (String, String) -> (String, String) -> String
-generateStateTypeCode (st, sd) (vt, _) =
+generateStateTypeCode :: (String, String) -> String -> String
+generateStateTypeCode (st, sd) vt =
     "type StateExtra = " ++ trim st ++ "\n" ++
     "type VarExtra = " ++ trim vt ++ "\n" ++
     "data PersistentState = PersistentState{ _nameCounter :: Int }\n" ++
     "data VarType = BaseType String\n" ++
-    "             | FuncType [([VarType], VarType, String)]\n" ++
+    "             | FuncType [VarType] VarType\n" ++
     "             | ParamType String VarType deriving Eq\n" ++
     "instance Show VarType where\n" ++
     "    show (BaseType s) = s\n" ++
     "    show (ParamType t v) = (paramTypesC ! t) $ show v\n" ++
-    "    show (FuncType fs) = \"function\"\n" ++
-    "data Var = Var{ _name :: String\n" ++
-    "              , _scopeLevel :: Int\n" ++
-    "              , _varType :: VarType\n" ++
-    "              , _cName :: String\n" ++
-    "              , _varExtra :: VarExtra\n" ++
-    "              } deriving Show\n" ++
-    "data VolatileState = VolatileState{ _vars :: HashMap String [Var]\n" ++
+    "    show (FuncType is o) = \"function\"\n" ++
+    "instance Hashable VarType where\n" ++
+    "    hashWithSalt salt (BaseType s) = hashWithSalt salt s\n" ++
+    "    hashWithSalt salt (ParamType t v) = hashWithSalt salt (t, v)\n" ++
+    "    hashWithSalt salt (FuncType is o) = hashWithSalt salt (is, o)\n" ++
+    "data Var e = Var{ _varName :: String\n" ++
+    "                , _varScopeLevel :: Int\n" ++
+    "                , _varType :: VarType\n" ++
+    "                , _varCName :: String\n" ++
+    "                , _varExtra :: e\n" ++
+    "                } deriving Show\n" ++
+    "data VolatileState = VolatileState{ _vars :: HashMap String [Var VarExtra]\n" ++
     "                                  , _currentScope :: Int\n" ++
+    "                                  , _staticFuncs :: HashMap (String, [VarType]) [Var ()]\n" ++
     "                                  , _stateExtra :: StateExtra\n" ++
     "                                  } deriving Show\n" ++
     "data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState }\n" ++
     "type StateResult a = StateT SemanticsState Result a\n" ++
-    "defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty 0 $ " ++ trim sd ++ "\n" ++
+    "defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty (-1) empty $ " ++ trim sd ++ "\n" ++
     "makeLenses ''SemanticsState\n" ++
     "makeLenses ''PersistentState\n" ++
     "makeLenses ''VolatileState\n" ++
@@ -82,17 +88,11 @@ classCode = "class SemanticsEvaluable a where\n" ++
             "    eval :: a -> StateResult (String, VarType)"
 
 utilsCode :: String
-utilsCode = "setVolatile :: VolatileState -> StateResult ()\n" ++
-            "setVolatile v = do\n" ++
-            "    env <- get\n" ++
-            "    put $ env { _volatileState=v }\n\n" ++
-            "incrementCounter :: StateResult Int\n" ++
+utilsCode = "incrementCounter :: StateResult Int\n" ++
             "incrementCounter = do\n" ++
-            "   env <- get\n" ++
-            "   let pState = _persistentState env\n" ++
-            "   let n = _nameCounter pState\n" ++
-            "   put env { _persistentState=(pState { _nameCounter = (n+1) }) }\n" ++
-            "   return n\n\n" ++
+            "   n <- use $ persistentState . nameCounter\n"  ++
+            "   modifying (persistentState . nameCounter) (+1)\n" ++
+            "   return n\n" ++
             "require :: String -> Bool -> StateResult ()\n" ++
             "require _ True = return ()\n" ++
             "require errMsg False = lift $ Error errMsg\n\n" ++
@@ -104,16 +104,16 @@ utilsCode = "setVolatile :: VolatileState -> StateResult ()\n" ++
             "evalFold forwardEnv (e:es) = do\n" ++
             "    env <- gets _volatileState\n" ++
             "    ((code, env'), t) <- runEval (eval e) env\n" ++
-            "    if forwardEnv then setVolatile env' else return ()\n" ++
+            "    if forwardEnv then assign volatileState env' else return ()\n" ++
             "    (codes, ts) <- evalFold forwardEnv es\n" ++
             "    return (code:codes, t:ts)\n\n" ++
             "runEval :: StateResult (a, b) -> VolatileState -> StateResult ((a, VolatileState), b)\n" ++
             "runEval f newVEnv = do\n" ++
-            "    oldVEnv <- gets _volatileState\n" ++
-            "    setVolatile newVEnv\n" ++
+            "    oldVEnv <- use volatileState\n" ++
+            "    assign volatileState newVEnv\n" ++
             "    (c, t) <- f\n" ++
-            "    modifiedVEnv <- gets _volatileState\n" ++
-            "    setVolatile oldVEnv\n" ++
+            "    modifiedVEnv <- use volatileState\n" ++
+            "    assign volatileState oldVEnv\n" ++
             "    return ((c, modifiedVEnv), t)\n\n" ++
             "getNewName :: StateResult String\n" ++
             "getNewName = do\n" ++
@@ -122,47 +122,50 @@ utilsCode = "setVolatile :: VolatileState -> StateResult ()\n" ++
             "indent :: String -> String\n" ++
             "indent s = intercalate \"\\n\" $ fmap (\"    \"++) $ lines s\n" ++
             "increaseScope :: VolatileState -> VolatileState\n" ++
-            "increaseScope s = s { _currentScope=(_currentScope s) + 1 }\n" ++
+            "increaseScope = over currentScope (+1)\n" ++
             "decreaseScope :: VolatileState -> VolatileState\n" ++
             "decreaseScope s = s { _currentScope = max 0 $ cScope - 1\n" ++
-            "                    , _vars = fmap (\\vs -> if _scopeLevel (head vs) == cScope then tail vs else vs) $ _vars s }\n" ++
+            "                    , _vars = removeVars $ _vars s\n" ++
+            "                    , _staticFuncs = removeVars $ _staticFuncs s }\n" ++
             "  where\n" ++
             "    cScope = _currentScope s\n" ++
+            "    removeVars vs = fmap (\\vs' -> if _varScopeLevel (head vs') == cScope then tail vs' else vs') vs\n" ++
             "toCType :: VarType -> String\n" ++
             "toCType (BaseType \"%command\") = \"void\"\n" ++
             "toCType (BaseType s) = baseTypesC ! s\n" ++
-            "toCType (FuncType fs) = \"struct { \" ++ (concat $ fmap\n" ++
-            "    (\\(is, o, i) -> toCType o ++ \" (*func\" ++ show i ++ \")(\" ++ intercalate \", \" (fmap toCType is) ++ \"); \") fs)\n" ++
-            "    ++ \"}\"\n" ++
+            "toCType (FuncType is o) = toCType o ++ \" (*)(\" ++ intercalate \", \" (fmap toCType is) ++ \")\"\n" ++
             "toCType (ParamType n t) = (paramTypesC ! n) $ toCType t\n" ++
-            "getVar :: String -> VolatileState -> Maybe Var\n" ++
+            "getVar :: String -> VolatileState -> Maybe (Var VarExtra)\n" ++
             "getVar name env = env ^? vars . at name . _Just . _head\n" ++
-            "getFuncVar :: String -> [VarType] -> VolatileState -> Maybe (Var, ([VarType], VarType, String))\n" ++
-            "getFuncVar name args env = getVar name env >>= (\\var -> case _varType var of\n" ++
-            "                                              (FuncType fs) -> fmap (\\d -> (var, d)) $\n" ++
-            "                                                               find (\\(args', _, _) -> args == args') fs\n" ++
-            "                                              otherwise     -> Nothing)\n" ++
-            "getFunc :: String -> [VarType] -> VolatileState -> Maybe (VarType, String)\n" ++
-            "getFunc name args env = do\n" ++
-            "                            (var, (_, ret, i)) <- getFuncVar name args env\n" ++
-            "                            return (ret, _cName var ++ \"->func\" ++ i)\n" ++
-            "getOp :: String -> [VarType] -> VolatileState -> Maybe (VarType, String)\n" ++
-            "getOp name args env = do\n" ++
-            "                          (_, (_, ret, i)) <- getFuncVar name args env\n" ++
-            "                          return (ret, i)\n" ++
-            "modifyVar :: Var -> (Var -> Var) -> VolatileState -> VolatileState\n" ++
+            "getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())\n" ++
+            "getStaticFunc name args env = env ^? staticFuncs . at (name, args) . _Just . _head\n" ++
+            "getVarFunc :: String -> [VarType] -> VolatileState -> Maybe (Var VarExtra, [VarType], VarType)\n" ++
+            "getVarFunc name args env = do\n" ++
+            "    var <- getVar name env\n" ++
+            "    case _varType var of\n" ++
+            "        FuncType is o -> Just (var, is, o)\n" ++
+            "        otherwise -> Nothing\n" ++
+            "modifyVar :: Var VarExtra -> (Var VarExtra -> Var VarExtra) -> VolatileState -> VolatileState\n" ++
             "modifyVar (Var name _ _ _ _) f = vars . at name . _Just . _head %~ f\n" ++
-            "addVar :: String -> VarExtra -> VarType -> VolatileState -> StateResult (Var, VolatileState)\n" ++
+            "addVar :: String -> VarExtra -> VarType -> VolatileState -> StateResult (Var VarExtra, VolatileState)\n" ++
             "addVar name extra t env = do\n" ++
             "    newName <- getNewName\n" ++
             "    let newVar = Var name (env ^. currentScope) t newName extra\n" ++
-            "    return (newVar, over vars (insertWith (++) name [newVar]) env)\n"
+            "    return (newVar, over vars (insertWith (++) name [newVar]) env)\n" ++
+            "addStaticFunc :: String -> [VarType] -> VarType -> String -> VolatileState -> VolatileState\n" ++
+            "addStaticFunc name args ret cName env = over (staticFuncs) (insertWith (++) (name, args) [newVar]) env\n" ++
+            "    where newVar = Var name (env ^. currentScope) ret cName ()\n" ++
+            "addVarFunc :: String -> [VarType] -> VarType -> VarExtra -> String -> VolatileState -> VolatileState\n" ++
+            "addVarFunc name args ret extra cName env = over vars (insertWith (++) name [newVar]) env\n" ++
+            "    where newVar = Var name (env ^. currentScope) (FuncType args ret) cName extra\n" ++
+            "modEnv :: (VolatileState -> VolatileState) -> StateResult ()\n" ++
+            "modEnv f = modifying volatileState f"
 
-generateEntryPoint :: Maybe String -> String
-generateEntryPoint outPreCode = unlines [
+generateEntryPoint :: Maybe String -> String -> String
+generateEntryPoint outPreCode stateDef = unlines [
     "runSemantics :: (SemanticsEvaluable a) => a -> Result String",
     "runSemantics input = do",
-    "    ((code, _), _) <- runStateT (eval input) defaultSemanticState",
+    "    ((code, _), _) <- runStateT ((" ++ stateDef ++ ") >> (modEnv increaseScope) >> eval input) defaultSemanticState",
     "    let wrappedCode = \"int main() {\\n\" ++ indent code ++ \"\\n    return 0;\\n}\"",
     (case outPreCode of
          Nothing -> "    return wrappedCode"

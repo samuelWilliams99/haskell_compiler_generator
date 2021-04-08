@@ -7,7 +7,7 @@ import Control.Lens
 import ParserRequirements
 import Data.HashMap.Strict
 import Data.List
-
+import Data.Hashable
 
 isBaseType :: String -> Bool
 isBaseType t = elem t ["int","boolean"]
@@ -20,25 +20,30 @@ type StateExtra = ()
 type VarExtra = (Bool, Bool)
 data PersistentState = PersistentState{ _nameCounter :: Int }
 data VarType = BaseType String
-             | FuncType [([VarType], VarType, Int)]
+             | FuncType [VarType] VarType
              | ParamType String VarType deriving Eq
 instance Show VarType where
     show (BaseType s) = s
     show (ParamType t v) = (paramTypesC ! t) $ show v
-    show (FuncType fs) = "function"
-data Var = Var{ _name :: String
-              , _scopeLevel :: Int
-              , _varType :: VarType
-              , _cName :: String
-              , _varExtra :: VarExtra
-              } deriving Show
-data VolatileState = VolatileState{ _vars :: HashMap String [Var]
+    show (FuncType is o) = "function"
+instance Hashable VarType where
+    hashWithSalt salt (BaseType s) = hashWithSalt salt s
+    hashWithSalt salt (ParamType t v) = hashWithSalt salt (t, v)
+    hashWithSalt salt (FuncType is o) = hashWithSalt salt (is, o)
+data Var e = Var{ _varName :: String
+                , _varScopeLevel :: Int
+                , _varType :: VarType
+                , _varCName :: String
+                , _varExtra :: e
+                } deriving Show
+data VolatileState = VolatileState{ _vars :: HashMap String [Var VarExtra]
                                   , _currentScope :: Int
+                                  , _staticFuncs :: HashMap (String, [VarType]) [Var ()]
                                   , _stateExtra :: StateExtra
                                   } deriving Show
 data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState }
 type StateResult a = StateT SemanticsState Result a
-defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty 0 $ ()
+defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty (-1) empty $ ()
 makeLenses ''SemanticsState
 makeLenses ''PersistentState
 makeLenses ''VolatileState
@@ -46,34 +51,40 @@ makeLenses ''Var
 makeLenses ''VarType
 
 
-makeDefined :: Var -> VolatileState -> VolatileState
+makeDefined :: Var VarExtra -> VolatileState -> VolatileState
 makeDefined v = modifyVar v $ varExtra . _1 .~ True
 preCode :: String
 preCode = unlines [
     "#include <stdio.h>",
     "void printInt(int x) { printf(\"%d\\n\", x); }"
     ]
-_defined :: Var -> Bool
+_defined :: Var VarExtra -> Bool
 _defined v = fst (_varExtra v)
-_const :: Var -> Bool
+_const :: Var VarExtra -> Bool
 _const v = snd (_varExtra v)
+addOp :: String -> String -> String -> StateResult ()
+addOp i o name = modEnv $ addStaticFunc name [BaseType i, BaseType i] (BaseType o) name
+intOps :: [String]
+intOps = ["^", "*", "/", "+", "-"]
+intCompOps :: [String]
+intCompOps = ["<", "<=", "==", "!=", ">=", ">"]
+boolCompOps :: [String]
+boolCompOps = ["==", "&&", "||"]
+makeStandardEnv = do
+    modEnv $ addStaticFunc "print" [BaseType "int"] (BaseType "%command") "printInt"
+    modEnv $ addStaticFunc "print" [BaseType "boolean"] (BaseType "%command") "printInt"
+    mapM (addOp "int" "int") intOps
+    mapM (addOp "int" "boolean") intCompOps
+    mapM (addOp "boolean" "boolean") boolCompOps
 
 class SemanticsEvaluable a where
     eval :: a -> StateResult (String, VarType)
 
-setVolatile :: VolatileState -> StateResult ()
-setVolatile v = do
-    env <- get
-    put $ env { _volatileState=v }
-
 incrementCounter :: StateResult Int
 incrementCounter = do
-   env <- get
-   let pState = _persistentState env
-   let n = _nameCounter pState
-   put env { _persistentState=(pState { _nameCounter = (n+1) }) }
+   n <- use $ persistentState . nameCounter
+   modifying (persistentState . nameCounter) (+1)
    return n
-
 require :: String -> Bool -> StateResult ()
 require _ True = return ()
 require errMsg False = lift $ Error errMsg
@@ -87,17 +98,17 @@ evalFold _ [] = return ([], [])
 evalFold forwardEnv (e:es) = do
     env <- gets _volatileState
     ((code, env'), t) <- runEval (eval e) env
-    if forwardEnv then setVolatile env' else return ()
+    if forwardEnv then assign volatileState env' else return ()
     (codes, ts) <- evalFold forwardEnv es
     return (code:codes, t:ts)
 
 runEval :: StateResult (a, b) -> VolatileState -> StateResult ((a, VolatileState), b)
 runEval f newVEnv = do
-    oldVEnv <- gets _volatileState
-    setVolatile newVEnv
+    oldVEnv <- use volatileState
+    assign volatileState newVEnv
     (c, t) <- f
-    modifiedVEnv <- gets _volatileState
-    setVolatile oldVEnv
+    modifiedVEnv <- use volatileState
+    assign volatileState oldVEnv
     return ((c, modifiedVEnv), t)
 
 getNewName :: StateResult String
@@ -107,38 +118,48 @@ getNewName = do
 indent :: String -> String
 indent s = intercalate "\n" $ fmap ("    "++) $ lines s
 increaseScope :: VolatileState -> VolatileState
-increaseScope s = s { _currentScope=(_currentScope s) + 1 }
+increaseScope = over currentScope (+1)
 decreaseScope :: VolatileState -> VolatileState
 decreaseScope s = s { _currentScope = max 0 $ cScope - 1
-                    , _vars = fmap (\vs -> if _scopeLevel (head vs) == cScope then tail vs else vs) $ _vars s }
+                    , _vars = removeVars $ _vars s
+                    , _staticFuncs = removeVars $ _staticFuncs s }
   where
     cScope = _currentScope s
+    removeVars vs = fmap (\vs' -> if _varScopeLevel (head vs') == cScope then tail vs' else vs') vs
 toCType :: VarType -> String
 toCType (BaseType "%command") = "void"
 toCType (BaseType s) = baseTypesC ! s
-toCType (FuncType fs) = "struct { " ++ (concat $ fmap
-    (\(is, o, i) -> toCType o ++ " (*func" ++ show i ++ ")(" ++ intercalate ", " (fmap toCType is) ++ "); ") fs)
-    ++ "}"
+toCType (FuncType is o) = toCType o ++ " (*)(" ++ intercalate ", " (fmap toCType is) ++ ")"
 toCType (ParamType n t) = (paramTypesC ! n) $ toCType t
-getVar :: String -> VolatileState -> Maybe Var
+getVar :: String -> VolatileState -> Maybe (Var VarExtra)
 getVar name env = env ^? vars . at name . _Just . _head
-getFunc :: String -> [VarType] -> VolatileState -> Maybe (VarType, String)
-getFunc name args env = getVar name env >>= (\var -> case _varType var of
-                                                (FuncType fs) -> fmap (\(_, t, i) -> (t, _cName var ++ "->func" ++ show i)) $
-                                                                 find (\(args', _, _) -> args == args') fs
-                                                otherwise     -> Nothing)
-modifyVar :: Var -> (Var -> Var) -> VolatileState -> VolatileState
+getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())
+getStaticFunc name args env = env ^? staticFuncs . at (name, args) . _Just . _head
+getVarFunc :: String -> [VarType] -> VolatileState -> Maybe (Var VarExtra, [VarType], VarType)
+getVarFunc name args env = do
+    var <- getVar name env
+    case _varType var of
+        FuncType is o -> Just (var, is, o)
+        otherwise -> Nothing
+modifyVar :: Var VarExtra -> (Var VarExtra -> Var VarExtra) -> VolatileState -> VolatileState
 modifyVar (Var name _ _ _ _) f = vars . at name . _Just . _head %~ f
-addVar :: String -> VarExtra -> VarType -> VolatileState -> StateResult (Var, VolatileState)
+addVar :: String -> VarExtra -> VarType -> VolatileState -> StateResult (Var VarExtra, VolatileState)
 addVar name extra t env = do
     newName <- getNewName
     let newVar = Var name (env ^. currentScope) t newName extra
     return (newVar, over vars (insertWith (++) name [newVar]) env)
-
+addStaticFunc :: String -> [VarType] -> VarType -> String -> VolatileState -> VolatileState
+addStaticFunc name args ret cName env = over (staticFuncs) (insertWith (++) (name, args) [newVar]) env
+    where newVar = Var name (env ^. currentScope) ret cName ()
+addVarFunc :: String -> [VarType] -> VarType -> VarExtra -> String -> VolatileState -> VolatileState
+addVarFunc name args ret extra cName env = over vars (insertWith (++) name [newVar]) env
+    where newVar = Var name (env ^. currentScope) (FuncType args ret) cName extra
+modEnv :: (VolatileState -> VolatileState) -> StateResult ()
+modEnv f = modifying volatileState f
 
 runSemantics :: (SemanticsEvaluable a) => a -> Result String
 runSemantics input = do
-    ((code, _), _) <- runStateT (eval input) defaultSemanticState
+    ((code, _), _) <- runStateT ((makeStandardEnv) >> (modEnv increaseScope) >> eval input) defaultSemanticState
     let wrappedCode = "int main() {\n" ++ indent code ++ "\n    return 0;\n}"
     return $ (preCode) ++ "\n\n" ++ wrappedCode
 
@@ -166,8 +187,9 @@ generateCodeASTExpr (ASTExprBinOp op x1 x2) = do
     ((x1s, _), t1) <- runEval (eval depVal0) depEnv0
     let (depVal1, depEnv1) = (x2, env)
     ((x2s, _), t2) <- runEval (eval depVal1) depEnv1
-    (rType, fName) <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ show t1 ++ " and " ++ show t2) $ getFunc op [t1, t2] env
-    return ("(" ++ x1s ++ ") " ++ fName ++ " (" ++ x2s ++ ")", rType)
+    var <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ show t1 ++ " and " ++ show t2) $ getStaticFunc op [t1, t2] env
+    let rType = var ^. varType
+    return ("(" ++ x1s ++ ") " ++ _varCName var ++ " (" ++ x2s ++ ")", rType)
 
 generateCodeASTExpr (ASTExprInt x) = do
     env <- use volatileState
@@ -181,7 +203,7 @@ generateCodeASTExpr (ASTExprVar name) = do
     env <- use volatileState
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require ("Variable " ++ name ++ " defined but not initialised") $ _defined var
-    return (_cName var, BaseType "int")
+    return (_varCName var, BaseType "int")
 
 generateCodeASTExpr (ASTExprUnOp "!" x) = do
     env <- use volatileState
@@ -205,7 +227,7 @@ generateCodeASTCommand (ASTAssign name x) = do
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require "Cannot assign to a constant variable" $ not $ _const var
     let env' = if not $ _defined var then makeDefined var env else env
-    let output = (_cName var ++ " = " ++ xs ++ ";", env')
+    let output = (_varCName var ++ " = " ++ xs ++ ";", env')
     assign volatileState $ snd output
     return (fst output, BaseType "%command")
 
@@ -213,8 +235,8 @@ generateCodeASTCommand (ASTCall name args) = do
     env <- use volatileState
     let (depVal0, depEnv0) = (args, env)
     ((argsS, _), types) <- runEval (evalFold False depVal0) depEnv0
-    (_, fName) <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getFunc name types env
-    return (fName ++ "(" ++ intercalate ", " argsS ++ ");", BaseType "%command")
+    var <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getStaticFunc name types env
+    return (_varCName var ++ "(" ++ intercalate ", " argsS ++ ");", BaseType "%command")
 
 generateCodeASTCommand (ASTIf cond tCmd fCmd) = do
     env <- use volatileState
@@ -244,10 +266,12 @@ generateCodeASTCommand (ASTLet decls cmd) = do
     let (depVal0, depEnv0) = (decls, env)
     ((declsS, env'), depType0) <- runEval (evalFold True depVal0) depEnv0
     require ("Expected " ++ show (BaseType "%command") ++ "'s, got " ++ show depType0) $ all (==BaseType "%command") depType0
-    let (depVal1, depEnv1) = (cmd, over currentScope (+1) env')
-    ((cmdS, _), depType1) <- runEval (eval depVal1) depEnv1
+    let (depVal1, depEnv1) = (cmd, increaseScope env')
+    ((cmdS, env''), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (BaseType "%command") ++ ", got " ++ show depType1) $ depType1 == BaseType "%command"
-    return ("{\n" ++ indent (intercalate "\n" declsS ++ "\n\n" ++ cmdS) ++ "\n}", BaseType "%command")
+    let output = ("{\n" ++ indent (intercalate "\n" declsS ++ "\n\n" ++ cmdS) ++ "\n}", decreaseScope env'')
+    assign volatileState $ snd output
+    return (fst output, BaseType "%command")
 
 generateCodeASTCommand (ASTSeq cmds) = do
     env <- use volatileState
@@ -268,14 +292,14 @@ generateCodeASTDecl (ASTDeclConst name val) = do
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
     (var, env') <- addVar name (True, True) (BaseType "int") env
-    let output = ("int " ++ _cName var ++ " = " ++ valS ++ ";", env')
+    let output = ("int " ++ _varCName var ++ " = " ++ valS ++ ";", env')
     assign volatileState $ snd output
     return (fst output, BaseType "%command")
 
 generateCodeASTDecl (ASTDeclVar name Nothing) = do
     env <- use volatileState
     (var, env') <- addVar name (False, False) (BaseType "int") env
-    let output = ("int " ++ _cName var ++ ";", env')
+    let output = ("int " ++ _varCName var ++ ";", env')
     assign volatileState $ snd output
     return (fst output, BaseType "%command")
 
@@ -285,7 +309,7 @@ generateCodeASTDecl (ASTDeclVar name (Just val)) = do
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
     (var, env') <- addVar name (True, False) (BaseType "int") env
-    let output = ("int " ++ _cName var ++ " = " ++ valS ++ ";", env')
+    let output = ("int " ++ _varCName var ++ " = " ++ valS ++ ";", env')
     assign volatileState $ snd output
     return (fst output, BaseType "%command")
 

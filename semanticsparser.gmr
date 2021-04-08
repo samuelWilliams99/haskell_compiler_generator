@@ -29,19 +29,22 @@ handleStatements stmts = aux stmts ""
       paramType     { TokenCustom "Directive" "paramtype" }
       astType       { TokenCustom "Directive" "asttype" }
       extension     { TokenCustom "Directive" "extension" }
-      precode       { TokenCustom "Directive" "precode" }
-      outputprecode { TokenCustom "Directive" "outputprecode" }
+      preCode       { TokenCustom "Directive" "precode" }
+      outputPreCode { TokenCustom "Directive" "outputprecode" }
+      standardEnv   { TokenCustom "Directive" "standardenv" }
 
-SemanticsDef :: Extension PreCode? OutPreCode?
-                BaseType+ ParamType*
-                StateExtra VarExtra Stmts                        { (v1, v3, uncurry (SemanticsDef (fromMaybe "" v2) (fromList v4) (fromList v5) v6 v7) $ handleStatements v8) }
+Main :: Extension PreCode? OutPreCode? SemanticsDef              { (v1, v2, v3, v4) }
+
+SemanticsDef :: BaseType+ ParamType*
+                StateExtra VarExtra
+                StandardEnv Stmts                                { uncurry (SemanticsDef (fromList v1) (fromList v2) v3 v4 v5) $ handleStatements v6 }
 
 Extension :: extension identifier                                { v2 }
 
-PreCode :: precode codeBlock                                     { v2 }
+PreCode :: preCode codeBlock                                     { v2 }
 
-OutPreCode :: outputprecode identifier                           { v2 }
-            | outputprecode codeBlock                            { v2 }
+OutPreCode :: outputPreCode identifier                           { v2 }
+            | outputPreCode codeBlock                            { v2 }
 
 CodeBlock :: codeBlock { v1 } | identifier { v1 } | upperIdentifier { v1 }
 
@@ -52,8 +55,10 @@ ParamType :: paramType identifier identifier                     { (v2, v3) }
 StateExtra :: stateExtra CodeBlock CodeBlock                     { (v2, v3) }
             | %empty                                             { ("()", "()") }
 
-VarExtra :: varExtra CodeBlock CodeBlock                         { (v2, v3) }
-          | %empty                                               { ("()", "()") }
+VarExtra :: varExtra CodeBlock                                   { v2 }
+          | %empty                                               { "()" }
+
+StandardEnv :: standardEnv CodeBlock                             { v2 }
 
 Stmts :: AstType Stmt+                                           { (Right v1):v2 }
 
