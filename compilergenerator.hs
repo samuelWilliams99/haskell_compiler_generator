@@ -12,26 +12,21 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- generalise the variable lookup and scope shit, most languages need this, the user shouldnt have to code it themselves
---     some increase and decrease scope functions that handle the scope value and remove vars that should be gone
---     some env changes surpass scope changes, such as defining an existing lower scope var
---     some languages separate vars and funcs, some dont, some way of generalising this concept
--- support parameterised types, like arrays, allow the user to choose the type of types, default is String
---     will need to change grammar to like this
-
--- make way to set standard env
---     probably some function to add functions lol
---     prob need to add a preCode thing to persistent env
---     then add the wacky fukin function def shit to it
---     idfk
+-- add way to match param types on deps
+--     maybe generalise the param type to have any amount of params ?
+--     could use some kinda of NonEmpty array of VarTypes
+-- remove the dumb %command stuff, its yuck
+--     just use a new constructor
+-- add something to functions to define includes they require, put a Set of includes in the persistent state
 
 
 
--- error source poses would be nice
--- something for includes?
 -- presets for code gen, user shouldnt need to know C
 --     perhaps with some kind of ShowC class, with instances for a bunch of the basic types
 --     then also some for like ops, blocks, loops, etc. or something idk
+--     assignment will be a lot nicer with the typeToC funcs
+-- error source poses would be nice
+-- something for includes?
 
 lowerStr :: String -> String
 lowerStr = map toLower
