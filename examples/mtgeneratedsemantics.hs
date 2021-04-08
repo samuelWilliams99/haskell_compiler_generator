@@ -13,7 +13,7 @@ isBaseType :: String -> Bool
 isBaseType t = elem t ["int","boolean"]
 baseTypesC :: HashMap String String
 baseTypesC = fromList [("int","int"),("boolean","int")]
-paramTypesC :: HashMap String (String -> String)
+paramTypesC :: HashMap String ([String] -> String)
 paramTypesC = fromList []
 
 type StateExtra = ()
@@ -21,16 +21,16 @@ type VarExtra = (Bool, Bool)
 data PersistentState = PersistentState{ _nameCounter :: Int }
 data VarType = BaseType String
              | FuncType [VarType] VarType
-             | ParamType String VarType
+             | ParamType String [VarType]
              | CommandType deriving Eq
 instance Show VarType where
     show (BaseType s) = s
-    show (ParamType t v) = (paramTypesC ! t) $ show v
+    show (ParamType t vs) = (paramTypesC ! t) $ fmap show vs
     show (FuncType is o) = "function"
     show CommandType = "command"
 instance Hashable VarType where
     hashWithSalt salt (BaseType s) = hashWithSalt salt s
-    hashWithSalt salt (ParamType t v) = hashWithSalt salt (t, v)
+    hashWithSalt salt (ParamType t vs) = hashWithSalt salt (t, vs)
     hashWithSalt salt (FuncType is o) = hashWithSalt salt (is, o)
     hashWithSalt salt CommandType = hashWithSalt salt "command"
 data Var e = Var{ _varName :: String
@@ -133,7 +133,7 @@ toCType :: VarType -> String
 toCType CommandType = "void"
 toCType (BaseType s) = baseTypesC ! s
 toCType (FuncType is o) = toCType o ++ " (*)(" ++ intercalate ", " (fmap toCType is) ++ ")"
-toCType (ParamType n t) = (paramTypesC ! n) $ toCType t
+toCType (ParamType n ts) = (paramTypesC ! n) $ fmap toCType ts
 getVar :: String -> VolatileState -> Maybe (Var VarExtra)
 getVar name env = env ^? vars . at name . _Just . _head
 getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())

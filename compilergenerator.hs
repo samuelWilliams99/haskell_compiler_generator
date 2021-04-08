@@ -12,12 +12,7 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- add way to match param types on deps
---     maybe generalise the param type to have any amount of params ?
---     could use some kinda of NonEmpty array of VarTypes
 -- add something to functions to define includes they require, put a Set of includes in the persistent state
-
-
 
 -- presets for code gen, user shouldnt need to know C
 --     perhaps with some kind of ShowC class, with instances for a bunch of the basic types

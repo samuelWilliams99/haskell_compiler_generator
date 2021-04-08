@@ -18,7 +18,7 @@ data SemanticsType = SemanticsCommandType | SemanticsStaticType String | Semanti
 instance Show SemanticsType where
     show SemanticsCommandType = "CommandType"
     show (SemanticsStaticBaseType s) = "BaseType " ++ show s
-    show (SemanticsStaticType s) = show s
+    show (SemanticsStaticType s) = s
     show (SemanticsVarType s) = s
 
 data SemanticsRule =

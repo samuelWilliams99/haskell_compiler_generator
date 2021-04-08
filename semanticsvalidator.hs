@@ -16,16 +16,18 @@ isVarType :: SemanticsDepOutputType -> Bool
 isVarType (RawSemanticsDepType (SemanticsVarType _)) = True
 isVarType _ = False
 
+isBaseType :: SemanticsDepOutputType -> Bool
+isBaseType (RawSemanticsDepType (SemanticsStaticBaseType _)) = True
+isBaseType _ = False
+
 getVarStr :: SemanticsType -> String
-getVarStr (SemanticsVarType s) = s
 getVarStr (SemanticsStaticType s) = s
 getVarStr (SemanticsStaticBaseType s) = s
 getVarStr SemanticsCommandType = ""
 
 validateBaseVars :: [String] -> SemanticsRuleDependency -> Result SemanticsRuleDependency
-validateBaseVars baseTypes dep = let (RawSemanticsDepType v) = _semanticsDepOutputType dep
-                                     name = getVarStr v
-                                 in if v == SemanticsCommandType || elem name baseTypes then
+validateBaseVars baseTypes dep = let (RawSemanticsDepType v@(SemanticsStaticBaseType name)) = _semanticsDepOutputType dep
+                                 in if elem name baseTypes then
                                      return $ dep { _semanticsDepOutputType=BuiltSemanticsDepTypeCompare v }
                                  else Error $ "Base type " ++ name ++ " is invalid"
 
@@ -42,13 +44,17 @@ validateTypeVars _ [] = []
 validateRuleTypes :: [String] -> SemanticsRule -> Result SemanticsRule
 validateRuleTypes baseTypes rule = do
     let deps = _semanticsRuleDeps rule
-    let (varTypeDeps, baseTypeDeps) = partition (isVarType . _semanticsDepOutputType) deps
+    let (varTypeDeps, nonVarDeps) = partition (isVarType . _semanticsDepOutputType) deps
+
+    let (baseTypeDeps, restDeps) = partition (isBaseType . _semanticsDepOutputType) nonVarDeps
 
     newBaseTypeDeps <- mapM (validateBaseVars baseTypes) baseTypeDeps
 
     let newVarTypeDeps = validateTypeVars [] varTypeDeps
 
-    let newDeps = newBaseTypeDeps ++ newVarTypeDeps
+    let newRestDeps = fmap (over semanticsDepOutputType (\(RawSemanticsDepType v) -> BuiltSemanticsDepTypeCompare v)) restDeps
+
+    let newDeps = newBaseTypeDeps ++ newVarTypeDeps ++ newRestDeps
 
     mapM (\x -> if elem x baseTypes then return () else Error $ "Type " ++ x ++ " is not a base type" )
         $ rule ^. semanticsRuleTypeRestrictions . traverse . semanticsTypeResOptions

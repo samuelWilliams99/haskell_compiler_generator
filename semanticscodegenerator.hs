@@ -54,16 +54,16 @@ generateStateTypeCode (st, sd) vt =
     "data PersistentState = PersistentState{ _nameCounter :: Int }\n" ++
     "data VarType = BaseType String\n" ++
     "             | FuncType [VarType] VarType\n" ++
-    "             | ParamType String VarType\n" ++
+    "             | ParamType String [VarType]\n" ++
     "             | CommandType deriving Eq\n" ++
     "instance Show VarType where\n" ++
     "    show (BaseType s) = s\n" ++
-    "    show (ParamType t v) = (paramTypesC ! t) $ show v\n" ++
+    "    show (ParamType t vs) = (paramTypesC ! t) $ fmap show vs\n" ++
     "    show (FuncType is o) = \"function\"\n" ++
     "    show CommandType = \"command\"\n" ++
     "instance Hashable VarType where\n" ++
     "    hashWithSalt salt (BaseType s) = hashWithSalt salt s\n" ++
-    "    hashWithSalt salt (ParamType t v) = hashWithSalt salt (t, v)\n" ++
+    "    hashWithSalt salt (ParamType t vs) = hashWithSalt salt (t, vs)\n" ++
     "    hashWithSalt salt (FuncType is o) = hashWithSalt salt (is, o)\n" ++
     "    hashWithSalt salt CommandType = hashWithSalt salt \"command\"\n" ++
     "data Var e = Var{ _varName :: String\n" ++
@@ -137,7 +137,7 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "toCType CommandType = \"void\"\n" ++
             "toCType (BaseType s) = baseTypesC ! s\n" ++
             "toCType (FuncType is o) = toCType o ++ \" (*)(\" ++ intercalate \", \" (fmap toCType is) ++ \")\"\n" ++
-            "toCType (ParamType n t) = (paramTypesC ! n) $ toCType t\n" ++
+            "toCType (ParamType n ts) = (paramTypesC ! n) $ fmap toCType ts\n" ++
             "getVar :: String -> VolatileState -> Maybe (Var VarExtra)\n" ++
             "getVar name env = env ^? vars . at name . _Just . _head\n" ++
             "getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())\n" ++
@@ -191,7 +191,7 @@ generateTypeCode baseTypes paramTypes = "isBaseType :: String -> Bool\n" ++
                                         "isBaseType t = elem t " ++ show (keys baseTypes) ++ "\n" ++
                                         "baseTypesC :: HashMap String String\n" ++
                                         "baseTypesC = " ++ show baseTypes ++ "\n" ++
-                                        "paramTypesC :: HashMap String (String -> String)\n" ++
+                                        "paramTypesC :: HashMap String ([String] -> String)\n" ++
                                         "paramTypesC = fromList " ++ show (fmap (\(n, f) -> "(" ++ show n ++ ", " ++ f ++ ")") $ toList paramTypes)
 
 getEvalFunc :: SemanticsRuleDependencyIterType -> String
@@ -207,15 +207,21 @@ generateDepEvalCode depType input output depTypeStr i =
            ]
 
 genererateDepType :: SemanticsDepOutputType -> Int -> String
-genererateDepType (BuiltSemanticsDepTypeAssign name) _ = name
+genererateDepType (BuiltSemanticsDepTypeAssign name) _ = trim name
 genererateDepType (BuiltSemanticsDepTypeCompare _) i = "depType" ++ show i
+
+generateDepTypeCodePre :: SemanticsType -> String -> Bool -> String
+generateDepTypeCodePre t depTypeStr plr =
+    "    require (\"Expected \" ++ show (" ++ trim (show t) ++ ") ++ \"" ++
+    (if plr then "'s" else "") ++
+    ", got \" ++ show " ++ depTypeStr ++ ") $ "
 
 generateDepTypeCode :: SemanticsDepOutputType -> String -> SemanticsRuleDependencyIterType -> String
 generateDepTypeCode (BuiltSemanticsDepTypeAssign _) _ _ = ""
 generateDepTypeCode (BuiltSemanticsDepTypeCompare t) depTypeStr (SemanticsDepFold _) =
-    "    require (\"Expected \" ++ show (" ++ show t ++ ") ++ \"'s, got \" ++ show " ++ depTypeStr ++ ") $ all (==" ++ show t ++ ") " ++ depTypeStr ++ "\n"
+    generateDepTypeCodePre t depTypeStr True ++ "all (==" ++ trim (show t) ++ ") " ++ depTypeStr ++ "\n"
 generateDepTypeCode (BuiltSemanticsDepTypeCompare t) depTypeStr _ =
-    "    require (\"Expected \" ++ show (" ++ show t ++ ") ++ \", got \" ++ show " ++ depTypeStr ++ ") $ " ++ depTypeStr ++ " == " ++ show t ++ "\n"
+    generateDepTypeCodePre t depTypeStr False ++ depTypeStr ++ " == " ++ trim (show t) ++ "\n"
 
 generateDepsCode :: Int -> [SemanticsRuleDependency] -> String
 generateDepsCode i [] = ""
@@ -235,15 +241,16 @@ generateDepsCode i ((SemanticsRuleDependency input output outputType usesEnv dep
 generateRestrictionsCode :: [SemanticsTypeRestriction] -> String
 generateRestrictionsCode [] = ""
 generateRestrictionsCode ((SemanticsTypeRestriction name ts):rs) =
-    "    require (\"Expected " ++ intercalate " or " ts ++ ", got \" ++ " ++ name ++ ") $ elem " ++ name ++ " $ " ++ show ts ++ "\n" ++ rest
+    "    require (\"Expected " ++ intercalate " or " ts ++ ", got \" ++ show " ++ name ++ ") $ " ++
+    "elem " ++ name ++ " $ " ++ show (fmap SemanticsStaticBaseType ts) ++ "\n" ++ rest
   where
     rest = generateRestrictionsCode rs
 
 generateRuleReturnCode :: Bool -> String -> SemanticsType -> String
 generateRuleReturnCode True out t = "    let output = " ++ trim out ++ "\n" ++
                                     "    assign volatileState $ snd output\n" ++
-                                    "    return (fst output, " ++ show t ++ ")"
-generateRuleReturnCode False out t = "    return (" ++ trim out ++ ", " ++ show t ++ ")"
+                                    "    return (fst output, " ++ trim (show t) ++ ")"
+generateRuleReturnCode False out t = "    return (" ++ trim out ++ ", " ++ trim (show t) ++ ")"
 
 generateRulesCode :: [SemanticsRule] -> String
 generateRulesCode [] = ""
