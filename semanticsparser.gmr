@@ -29,17 +29,20 @@ handleStatements stmts = aux stmts ""
       paramType     { TokenCustom "Directive" "paramtype" }
       astType       { TokenCustom "Directive" "asttype" }
       extension     { TokenCustom "Directive" "extension" }
+      importsCode   { TokenCustom "Directive" "importscode" }
       preCode       { TokenCustom "Directive" "precode" }
       outputPreCode { TokenCustom "Directive" "outputprecode" }
       standardEnv   { TokenCustom "Directive" "standardenv" }
 
-Main :: Extension PreCode? OutPreCode? SemanticsDef              { (v1, v2, v3, v4) }
+Main :: Extension Imports? PreCode? OutPreCode? SemanticsDef     { (v1, v2, v3, v4, v5) }
 
 SemanticsDef :: BaseType+ ParamType*
                 StateExtra VarExtra
                 StandardEnv Stmts                                { uncurry (SemanticsDef (fromList v1) (fromList v2) v3 v4 v5) $ handleStatements v6 }
 
 Extension :: extension identifier                                { v2 }
+
+Imports :: importsCode codeBlock                                 { v2 }
 
 PreCode :: preCode codeBlock                                     { v2 }
 

@@ -17,12 +17,12 @@ trim = dropWhileEnd isSpace . dropWhile isSpace
 unindent :: String -> String
 unindent = reindent 0
 
-generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> SemanticsDef -> String
-generateSemanticsCode name parserName preCode outPreCode
+generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> Maybe String -> SemanticsDef -> String
+generateSemanticsCode name parserName imports preCode outPreCode
     (SemanticsDef baseTypes paramTypes stateExtra varExtra stateDef rules astTypes) =
     intercalate "\n\n"
         [ generateModuleCode name
-        , generateImportsCode parserName
+        , generateImportsCode parserName imports
         , generateTypeCode baseTypes paramTypes
         , generateStateTypeCode stateExtra varExtra
         , unindent $ fromMaybe "" preCode
@@ -36,8 +36,8 @@ generateSemanticsCode name parserName preCode outPreCode
 generateModuleCode :: String -> String
 generateModuleCode name = "module " ++ name ++ " (runSemantics) where"
 
-generateImportsCode :: String -> String
-generateImportsCode parserName =
+generateImportsCode :: String -> Maybe String -> String
+generateImportsCode parserName mImports =
     "import " ++ parserName ++ "\n" ++
     "import Control.Monad.Trans.State.Lazy\n" ++
     "import Control.Monad.Trans.Class\n" ++
@@ -45,7 +45,8 @@ generateImportsCode parserName =
     "import ParserRequirements\n" ++
     "import Data.HashMap.Strict\n" ++
     "import Data.List\n" ++
-    "import Data.Hashable"
+    "import Data.Hashable\n" ++
+    unindent (fromMaybe "" mImports)
 
 generateStateTypeCode :: (String, String) -> String -> String
 generateStateTypeCode (st, sd) vt =

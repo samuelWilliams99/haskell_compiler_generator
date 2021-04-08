@@ -60,10 +60,10 @@ generateCompiler gmr smt modulePrefix = do
 
 generateSemantics :: String -> String -> String -> Result (String, String)
 generateSemantics smt parserName name = do
-    (ext, preCode, outPreCode, semantics) <- runParser smt
+    (ext, imports, preCode, outPreCode, semantics) <- runParser smt
 
     validatedSemantics <- validateSemantics semantics
 
-    let code = generateSemanticsCode name parserName preCode outPreCode validatedSemantics
+    let code = generateSemanticsCode name parserName imports preCode outPreCode validatedSemantics
 
     return (code, ext)

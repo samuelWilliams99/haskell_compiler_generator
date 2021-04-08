@@ -9,6 +9,7 @@ import Data.HashMap.Strict
 import Data.List
 import Data.Hashable
 
+
 isBaseType :: String -> Bool
 isBaseType t = elem t ["int","boolean"]
 baseTypesC :: HashMap String String
