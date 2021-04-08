@@ -15,8 +15,6 @@ import MainCodeGenerator
 -- add way to match param types on deps
 --     maybe generalise the param type to have any amount of params ?
 --     could use some kinda of NonEmpty array of VarTypes
--- remove the dumb %command stuff, its yuck
---     just use a new constructor
 -- add something to functions to define includes they require, put a Set of includes in the persistent state
 
 

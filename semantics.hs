@@ -13,10 +13,10 @@ data SemanticsDef =
                 , _semanticsAstTypes :: [String]
                 } deriving Show
 
-data SemanticsType = SemanticsCommandType | SemanticsStaticType String | SemanticsStaticBaseType String | SemanticsVarType String
+data SemanticsType = SemanticsCommandType | SemanticsStaticType String | SemanticsStaticBaseType String | SemanticsVarType String deriving Eq
 
 instance Show SemanticsType where
-    show SemanticsCommandType = "BaseType " ++ show "%command"
+    show SemanticsCommandType = "CommandType"
     show (SemanticsStaticBaseType s) = "BaseType " ++ show s
     show (SemanticsStaticType s) = show s
     show (SemanticsVarType s) = s

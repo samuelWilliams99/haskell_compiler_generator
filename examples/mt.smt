@@ -28,8 +28,8 @@ boolCompOps :: [String]
 boolCompOps = ["==", "&&", "||"]
 
 makeStandardEnv = do
-    modEnv $ addStaticFunc "print" [BaseType "int"] (BaseType "%command") "printInt"
-    modEnv $ addStaticFunc "print" [BaseType "boolean"] (BaseType "%command") "printInt"
+    modEnv $ addStaticFunc "print" [BaseType "int"] (CommandType) "printInt"
+    modEnv $ addStaticFunc "print" [BaseType "boolean"] (CommandType) "printInt"
     mapM (addOp "int" "int") intOps
     mapM (addOp "int" "boolean") intCompOps
     mapM (addOp "boolean" "boolean") boolCompOps

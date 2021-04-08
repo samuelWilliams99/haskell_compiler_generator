@@ -54,15 +54,18 @@ generateStateTypeCode (st, sd) vt =
     "data PersistentState = PersistentState{ _nameCounter :: Int }\n" ++
     "data VarType = BaseType String\n" ++
     "             | FuncType [VarType] VarType\n" ++
-    "             | ParamType String VarType deriving Eq\n" ++
+    "             | ParamType String VarType\n" ++
+    "             | CommandType deriving Eq\n" ++
     "instance Show VarType where\n" ++
     "    show (BaseType s) = s\n" ++
     "    show (ParamType t v) = (paramTypesC ! t) $ show v\n" ++
     "    show (FuncType is o) = \"function\"\n" ++
+    "    show CommandType = \"command\"\n" ++
     "instance Hashable VarType where\n" ++
     "    hashWithSalt salt (BaseType s) = hashWithSalt salt s\n" ++
     "    hashWithSalt salt (ParamType t v) = hashWithSalt salt (t, v)\n" ++
     "    hashWithSalt salt (FuncType is o) = hashWithSalt salt (is, o)\n" ++
+    "    hashWithSalt salt CommandType = hashWithSalt salt \"command\"\n" ++
     "data Var e = Var{ _varName :: String\n" ++
     "                , _varScopeLevel :: Int\n" ++
     "                , _varType :: VarType\n" ++
@@ -131,7 +134,7 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "    cScope = _currentScope s\n" ++
             "    removeVars vs = fmap (\\vs' -> if _varScopeLevel (head vs') == cScope then tail vs' else vs') vs\n" ++
             "toCType :: VarType -> String\n" ++
-            "toCType (BaseType \"%command\") = \"void\"\n" ++
+            "toCType CommandType = \"void\"\n" ++
             "toCType (BaseType s) = baseTypesC ! s\n" ++
             "toCType (FuncType is o) = toCType o ++ \" (*)(\" ++ intercalate \", \" (fmap toCType is) ++ \")\"\n" ++
             "toCType (ParamType n t) = (paramTypesC ! n) $ toCType t\n" ++

@@ -20,12 +20,12 @@ getVarStr :: SemanticsType -> String
 getVarStr (SemanticsVarType s) = s
 getVarStr (SemanticsStaticType s) = s
 getVarStr (SemanticsStaticBaseType s) = s
-getVarStr SemanticsCommandType = "%command"
+getVarStr SemanticsCommandType = ""
 
 validateBaseVars :: [String] -> SemanticsRuleDependency -> Result SemanticsRuleDependency
 validateBaseVars baseTypes dep = let (RawSemanticsDepType v) = _semanticsDepOutputType dep
                                      name = getVarStr v
-                                 in if elem name baseTypes then
+                                 in if v == SemanticsCommandType || elem name baseTypes then
                                      return $ dep { _semanticsDepOutputType=BuiltSemanticsDepTypeCompare v }
                                  else Error $ "Base type " ++ name ++ " is invalid"
 
@@ -44,7 +44,7 @@ validateRuleTypes baseTypes rule = do
     let deps = _semanticsRuleDeps rule
     let (varTypeDeps, baseTypeDeps) = partition (isVarType . _semanticsDepOutputType) deps
 
-    newBaseTypeDeps <- mapM (validateBaseVars $ "%command":baseTypes) baseTypeDeps
+    newBaseTypeDeps <- mapM (validateBaseVars baseTypes) baseTypeDeps
 
     let newVarTypeDeps = validateTypeVars [] varTypeDeps
 
