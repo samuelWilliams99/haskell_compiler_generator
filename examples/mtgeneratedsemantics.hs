@@ -8,6 +8,7 @@ import ParserRequirements
 import Data.HashMap.Strict
 import Data.List
 import Data.Hashable
+import Data.Maybe
 
 
 isBaseType :: String -> Bool
@@ -188,8 +189,10 @@ cCallExpr :: Var a -> [String] -> String
 cCallExpr v args = cVar v ++ "(" ++ intercalate ", " args ++ ")"
 cBlock :: String -> String
 cBlock str = "{\n" ++ indent str ++ "\n}"
-cIf :: String -> String -> String -> String
-cIf cond cmdT cmdF = "if(" ++ cond ++ ")" ++ cBlock cmdT ++ " else " ++ cBlock cmdF
+cIf :: [(String, String)] -> Maybe String -> String
+cIf cs mElse = (concat $ fmap (\(cond, cmd) -> "if(" ++ cond ++ ")" ++ cBlock cmd ++ " else ") cs) ++ cBlock (fromMaybe "" mElse)
+cSimpleIf :: String -> String -> String -> String
+cSimpleIf cond t f = cIf [(cond, t)] (Just f)
 cSeq :: [String] -> String
 cSeq = intercalate "\n"
 cPass :: String
@@ -291,7 +294,7 @@ generateCodeASTCommand (ASTIf cond tCmd fCmd) = do
     let (depVal2, depEnv2) = (fCmd, env)
     ((fCmdS, _), depType2) <- runEval (eval depVal2) depEnv2
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType2) $ depType2 == CommandType
-    return (cIf condS tCmdS fCmdS, CommandType)
+    return (cSimpleIf condS tCmdS fCmdS, CommandType)
 
 generateCodeASTCommand (ASTWhile cond cmd) = do
     env <- use volatileState

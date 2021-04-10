@@ -91,7 +91,7 @@ case { ASTCall name args } -> { cCall var argsS }
             var <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getStaticFunc name types env
         }
 
-case { ASTIf cond tCmd fCmd } -> { cIf condS tCmdS fCmdS }
+case { ASTIf cond tCmd fCmd } -> { cSimpleIf condS tCmdS fCmdS }
     evaluating
         cond -> condS @ "boolean"
         tCmd -> tCmdS

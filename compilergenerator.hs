@@ -12,8 +12,6 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- preset for if elseif else chains
-
 -- error source poses would be nice
 -- something for includes?
 

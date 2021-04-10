@@ -47,6 +47,7 @@ generateImportsCode parserName mImports =
     "import Data.HashMap.Strict\n" ++
     "import Data.List\n" ++
     "import Data.Hashable\n" ++
+    "import Data.Maybe\n" ++
     unindent (fromMaybe "" mImports)
 
 generateStateTypeCode :: (String, String) -> String -> String
@@ -199,8 +200,10 @@ cPresetsCode = "cBinOp :: String -> String -> String -> String\n" ++
                "cCallExpr v args = cVar v ++ \"(\" ++ intercalate \", \" args ++ \")\"\n" ++
                "cBlock :: String -> String\n" ++
                "cBlock str = \"{\\n\" ++ indent str ++ \"\\n}\"\n" ++
-               "cIf :: String -> String -> String -> String\n" ++
-               "cIf cond cmdT cmdF = \"if(\" ++ cond ++ \")\" ++ cBlock cmdT ++ \" else \" ++ cBlock cmdF\n" ++
+               "cIf :: [(String, String)] -> Maybe String -> String\n" ++
+               "cIf cs mElse = (concat $ fmap (\\(cond, cmd) -> \"if(\" ++ cond ++ \")\" ++ cBlock cmd ++ \" else \") cs) ++ cBlock (fromMaybe \"\" mElse)\n" ++
+               "cSimpleIf :: String -> String -> String -> String\n" ++
+               "cSimpleIf cond t f = cIf [(cond, t)] (Just f)\n" ++
                "cSeq :: [String] -> String\n" ++
                "cSeq = intercalate \"\\n\"\n" ++
                "cPass :: String\n" ++
