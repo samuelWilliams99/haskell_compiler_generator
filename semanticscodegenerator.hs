@@ -29,6 +29,7 @@ generateSemanticsCode name parserName imports preCode outPreCode
         , classCode
         , utilsCode
         , generateEntryPoint outPreCode stateDef
+        , cPresetsCode
         , generateInstanceCode astTypes
         , generateRulesCode rules
         ]
@@ -176,6 +177,44 @@ generateEntryPoint outPreCode stateDef = unlines [
          Just s  -> "    return $ (" ++ s ++ ") ++ \"\\n\\n\" ++ wrappedCode"
     )
     ]
+
+cPresetsCode :: String
+cPresetsCode = "cBinOp :: String -> String -> String -> String\n" ++
+               "cBinOp x y op = \"(\" ++ x ++ \") \" ++ op ++ \" (\" ++ y ++ \")\"\n" ++
+               "cUnOp :: String -> String -> String\n" ++
+               "cUnOp x op = \"(\" ++ op ++ \"(\" ++ x ++ \"))\"\n" ++
+               "cInt :: Int -> String\n" ++
+               "cInt = show\n" ++
+               "cFloat :: Float -> String\n" ++
+               "cFloat = show\n" ++
+               "cBool :: Bool -> String\n" ++
+               "cBool b = if b then \"1\" else \"0\"\n" ++
+               "cVar :: Var a -> String\n" ++
+               "cVar = _varCName\n" ++
+               "cAssignVar :: Var a -> String -> String\n" ++
+               "cAssignVar v x = cVar v ++ \" = \" ++ x ++ \";\"\n" ++
+               "cCall :: Var a -> [String] -> String\n" ++
+               "cCall v args = cCallExpr v args ++ \";\"\n" ++
+               "cCallExpr :: Var a -> [String] -> String\n" ++
+               "cCallExpr v args = cVar v ++ \"(\" ++ intercalate \", \" args ++ \")\"\n" ++
+               "cBlock :: String -> String\n" ++
+               "cBlock str = \"{\\n\" ++ indent str ++ \"\\n}\"\n" ++
+               "cIf :: String -> String -> String -> String\n" ++
+               "cIf cond cmdT cmdF = \"if(\" ++ cond ++ \")\" ++ cBlock cmdT ++ \" else \" ++ cBlock cmdF\n" ++
+               "cSeq :: [String] -> String\n" ++
+               "cSeq = intercalate \"\\n\"\n" ++
+               "cPass :: String\n" ++
+               "cPass = \"\"\n" ++
+               "cCreateVar :: Var a -> Maybe String -> String\n" ++
+               "cCreateVar v Nothing = toCType (_varType v) ++ \" \" ++ cVar v ++ \";\"\n" ++
+               "cCreateVar v (Just s) = toCType (_varType v) ++ \" \" ++ cVar v ++ \" = \" ++ s ++ \";\"\n" ++
+               "cWhile :: String -> String -> String\n" ++
+               "cWhile cond cmd = \"while(\" ++ cond ++ \")\" ++ cBlock cmd\n" ++
+               "cRawFor :: Var a -> String -> String -> String -> String -> String\n" ++
+               "cRawFor v init cond step cmd = \"for(\" ++ cCreateVar v (Just init) ++ \"; \" ++ cond ++ \"; \" ++ step ++ \")\" ++ cBlock cmd\n" ++
+               "cSimpleFor :: Var a -> String -> String -> String -> String -> String\n" ++
+               "cSimpleFor v init limit step cmd = cBlock $ \"int limit = \" ++ limit ++ \";\\n\" ++\n" ++
+               "                                            cRawFor v init \"limit\" (cVar v ++ \" += \" ++ step) cmd\n"
 
 astFuncName :: String -> String
 astFuncName t = "generateCode" ++ t

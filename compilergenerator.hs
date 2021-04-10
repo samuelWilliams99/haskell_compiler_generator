@@ -12,12 +12,8 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- add something to functions to define includes they require, put a Set of includes in the persistent state
+-- preset for if elseif else chains
 
--- presets for code gen, user shouldnt need to know C
---     perhaps with some kind of ShowC class, with instances for a bunch of the basic types
---     then also some for like ops, blocks, loops, etc. or something idk
---     assignment will be a lot nicer with the typeToC funcs
 -- error source poses would be nice
 -- something for includes?
 

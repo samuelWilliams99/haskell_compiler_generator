@@ -168,6 +168,44 @@ runSemantics input = do
     return $ (preCode) ++ "\n\n" ++ wrappedCode
 
 
+cBinOp :: String -> String -> String -> String
+cBinOp x y op = "(" ++ x ++ ") " ++ op ++ " (" ++ y ++ ")"
+cUnOp :: String -> String -> String
+cUnOp x op = "(" ++ op ++ "(" ++ x ++ "))"
+cInt :: Int -> String
+cInt = show
+cFloat :: Float -> String
+cFloat = show
+cBool :: Bool -> String
+cBool b = if b then "1" else "0"
+cVar :: Var a -> String
+cVar = _varCName
+cAssignVar :: Var a -> String -> String
+cAssignVar v x = cVar v ++ " = " ++ x ++ ";"
+cCall :: Var a -> [String] -> String
+cCall v args = cCallExpr v args ++ ";"
+cCallExpr :: Var a -> [String] -> String
+cCallExpr v args = cVar v ++ "(" ++ intercalate ", " args ++ ")"
+cBlock :: String -> String
+cBlock str = "{\n" ++ indent str ++ "\n}"
+cIf :: String -> String -> String -> String
+cIf cond cmdT cmdF = "if(" ++ cond ++ ")" ++ cBlock cmdT ++ " else " ++ cBlock cmdF
+cSeq :: [String] -> String
+cSeq = intercalate "\n"
+cPass :: String
+cPass = ""
+cCreateVar :: Var a -> Maybe String -> String
+cCreateVar v Nothing = toCType (_varType v) ++ " " ++ cVar v ++ ";"
+cCreateVar v (Just s) = toCType (_varType v) ++ " " ++ cVar v ++ " = " ++ s ++ ";"
+cWhile :: String -> String -> String
+cWhile cond cmd = "while(" ++ cond ++ ")" ++ cBlock cmd
+cRawFor :: Var a -> String -> String -> String -> String -> String
+cRawFor v init cond step cmd = "for(" ++ cCreateVar v (Just init) ++ "; " ++ cond ++ "; " ++ step ++ ")" ++ cBlock cmd
+cSimpleFor :: Var a -> String -> String -> String -> String -> String
+cSimpleFor v init limit step cmd = cBlock $ "int limit = " ++ limit ++ ";\n" ++
+                                            cRawFor v init "limit" (cVar v ++ " += " ++ step) cmd
+
+
 generateCodeASTExpr :: ASTExpr -> StateResult (String, VarType)
 
 instance SemanticsEvaluable ASTExpr where
@@ -193,35 +231,35 @@ generateCodeASTExpr (ASTExprBinOp op x1 x2) = do
     ((x2s, _), t2) <- runEval (eval depVal1) depEnv1
     var <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ show t1 ++ " and " ++ show t2) $ getStaticFunc op [t1, t2] env
     let rType = var ^. varType
-    return ("(" ++ x1s ++ ") " ++ _varCName var ++ " (" ++ x2s ++ ")", rType)
+    return (cBinOp x1s x2s (cVar var), rType)
 
 generateCodeASTExpr (ASTExprInt x) = do
     env <- use volatileState
-    return (show x, BaseType "int")
+    return (cInt x, BaseType "int")
 
 generateCodeASTExpr (ASTExprBool b) = do
     env <- use volatileState
-    return (if b then "1" else "0", BaseType "boolean")
+    return (cBool b, BaseType "boolean")
 
 generateCodeASTExpr (ASTExprVar name) = do
     env <- use volatileState
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require ("Variable " ++ name ++ " defined but not initialised") $ _defined var
-    return (_varCName var, BaseType "int")
+    return (cVar var, BaseType "int")
 
 generateCodeASTExpr (ASTExprUnOp "!" x) = do
     env <- use volatileState
     let (depVal0, depEnv0) = (x, env)
     ((xs, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "boolean") ++ ", got " ++ show depType0) $ depType0 == BaseType "boolean"
-    return ("!(" ++ xs ++ ")", BaseType "boolean")
+    return (cUnOp xs "!", BaseType "boolean")
 
 generateCodeASTExpr (ASTExprUnOp "-" x) = do
     env <- use volatileState
     let (depVal0, depEnv0) = (x, env)
     ((xs, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
-    return ("-(" ++ xs ++ ")", BaseType "int")
+    return (cUnOp xs "-", BaseType "int")
 
 generateCodeASTCommand (ASTAssign name x) = do
     env <- use volatileState
@@ -231,7 +269,7 @@ generateCodeASTCommand (ASTAssign name x) = do
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require "Cannot assign to a constant variable" $ not $ _const var
     let env' = if not $ _defined var then makeDefined var env else env
-    let output = (_varCName var ++ " = " ++ xs ++ ";", env')
+    let output = (cAssignVar var xs, env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
@@ -240,7 +278,7 @@ generateCodeASTCommand (ASTCall name args) = do
     let (depVal0, depEnv0) = (args, env)
     ((argsS, _), types) <- runEval (evalFold False depVal0) depEnv0
     var <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getStaticFunc name types env
-    return (_varCName var ++ "(" ++ intercalate ", " argsS ++ ");", CommandType)
+    return (cCall var argsS, CommandType)
 
 generateCodeASTCommand (ASTIf cond tCmd fCmd) = do
     env <- use volatileState
@@ -253,7 +291,7 @@ generateCodeASTCommand (ASTIf cond tCmd fCmd) = do
     let (depVal2, depEnv2) = (fCmd, env)
     ((fCmdS, _), depType2) <- runEval (eval depVal2) depEnv2
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType2) $ depType2 == CommandType
-    return ("if( " ++ condS ++ " ){\n" ++ indent tCmdS ++ "\n} else {\n" ++ indent fCmdS ++ "\n}", CommandType)
+    return (cIf condS tCmdS fCmdS, CommandType)
 
 generateCodeASTCommand (ASTWhile cond cmd) = do
     env <- use volatileState
@@ -263,7 +301,7 @@ generateCodeASTCommand (ASTWhile cond cmd) = do
     let (depVal1, depEnv1) = (cmd, env)
     ((cmdS, _), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType1) $ depType1 == CommandType
-    return ("while( " ++ condS ++ " ){\n" ++ indent cmdS ++ "\n}", CommandType)
+    return (cWhile condS cmdS, CommandType)
 
 generateCodeASTCommand (ASTLet decls cmd) = do
     env <- use volatileState
@@ -273,7 +311,7 @@ generateCodeASTCommand (ASTLet decls cmd) = do
     let (depVal1, depEnv1) = (cmd, increaseScope env')
     ((cmdS, env''), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType1) $ depType1 == CommandType
-    let output = ("{\n" ++ indent (intercalate "\n" declsS ++ "\n\n" ++ cmdS) ++ "\n}", decreaseScope env'')
+    let output = (cBlock $ cSeq $ declsS ++ [cmdS], decreaseScope env'')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
@@ -282,13 +320,13 @@ generateCodeASTCommand (ASTSeq cmds) = do
     let (depVal0, depEnv0) = (cmds, env)
     ((cmdsS, env'), depType0) <- runEval (evalFold True depVal0) depEnv0
     require ("Expected " ++ show (CommandType) ++ "'s, got " ++ show depType0) $ all (==CommandType) depType0
-    let output = (intercalate "\n" cmdsS, env')
+    let output = (cSeq cmdsS, env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
 generateCodeASTCommand (ASTPass) = do
     env <- use volatileState
-    return ("", CommandType)
+    return (cPass, CommandType)
 
 generateCodeASTDecl (ASTDeclConst name val) = do
     env <- use volatileState
@@ -296,14 +334,14 @@ generateCodeASTDecl (ASTDeclConst name val) = do
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
     (var, env') <- addVar name (True, True) (BaseType "int") env
-    let output = ("int " ++ _varCName var ++ " = " ++ valS ++ ";", env')
+    let output = (cCreateVar var (Just valS), env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
 generateCodeASTDecl (ASTDeclVar name Nothing) = do
     env <- use volatileState
     (var, env') <- addVar name (False, False) (BaseType "int") env
-    let output = ("int " ++ _varCName var ++ ";", env')
+    let output = (cCreateVar var Nothing, env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
@@ -313,7 +351,7 @@ generateCodeASTDecl (ASTDeclVar name (Just val)) = do
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
     (var, env') <- addVar name (True, False) (BaseType "int") env
-    let output = ("int " ++ _varCName var ++ " = " ++ valS ++ ";", env')
+    let output = (cCreateVar var (Just valS), env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
