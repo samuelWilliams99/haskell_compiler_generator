@@ -1,4 +1,4 @@
-module MtGeneratedSemantics (runSemantics) where
+module MtGeneratedSemantics (runSemantics, rDefaultState, _outPreCode, indent, VolatileState (..), PersistentState (..), SemanticsState (..)) where
 
 import MtGeneratedParser
 import Control.Monad.Trans.State.Lazy
@@ -6,9 +6,10 @@ import Control.Monad.Trans.Class
 import Control.Lens
 import ParserRequirements
 import Data.HashMap.Strict
-import Data.List
+import Data.List hiding (union)
 import Data.Hashable
 import Data.Maybe
+import Data.Monoid
 
 
 isBaseType :: String -> Bool
@@ -46,14 +47,20 @@ data VolatileState = VolatileState{ _vars :: HashMap String [Var VarExtra]
                                   , _staticFuncs :: HashMap (String, [VarType]) [Var ()]
                                   , _stateExtra :: StateExtra
                                   } deriving Show
-data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState }
+instance Semigroup VolatileState where
+    (VolatileState vs1 _ fs1 e1) <> (VolatileState vs2 _ fs2 e2) = VolatileState (union vs2 vs1) 0 (union fs2 fs1) (e1 <> e2)
+instance Monoid VolatileState where
+    mempty = VolatileState empty (-1) empty mempty
+data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState, _psState :: ParseState }
 type StateResult a = StateT SemanticsState Result a
-defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty (-1) empty $ ()
+defaultPersistentState = PersistentState 0
 makeLenses ''SemanticsState
 makeLenses ''PersistentState
 makeLenses ''VolatileState
 makeLenses ''Var
 makeLenses ''VarType
+rDefaultState :: Result SemanticsState
+rDefaultState = fmap snd $ runStateT (makeStandardEnv >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState "")
 
 
 makeDefined :: Var VarExtra -> VolatileState -> VolatileState
@@ -81,6 +88,13 @@ makeStandardEnv = do
     mapM (addOp "int" "int") intOps
     mapM (addOp "int" "boolean") intCompOps
     mapM (addOp "boolean" "boolean") boolCompOps
+    env <- use volatileState
+    (_, env') <- addVar "test" (False, False) (BaseType "int") env
+    assign volatileState env'
+
+_outPreCode :: String
+_outPreCode = preCode ++ "\n\n"
+
 
 class SemanticsEvaluable a where
     eval :: a -> StateResult (String, VarType)
@@ -90,12 +104,15 @@ incrementCounter = do
    n <- use $ persistentState . nameCounter
    modifying (persistentState . nameCounter) (+1)
    return n
+err :: String -> StateResult a
+err errMsg = use psState >>= \ps -> lift $ Error $ errMsg ++ " at " ++ showPos ps
+
 require :: String -> Bool -> StateResult ()
 require _ True = return ()
-require errMsg False = lift $ Error errMsg
+require errMsg False = err errMsg
 
 forceMaybe :: String -> Maybe a -> StateResult a
-forceMaybe errMsg Nothing = lift $ Error errMsg
+forceMaybe errMsg Nothing = err errMsg
 forceMaybe _ (Just a) = return a
 
 evalFold :: (SemanticsEvaluable a) => Bool -> [a] -> StateResult ([String], [VarType])
@@ -162,11 +179,10 @@ addVarFunc name args ret extra cName env = over vars (insertWith (++) name [newV
 modEnv :: (VolatileState -> VolatileState) -> StateResult ()
 modEnv f = modifying volatileState f
 
-runSemantics :: (SemanticsEvaluable a) => a -> Result String
-runSemantics input = do
-    ((code, _), _) <- runStateT ((makeStandardEnv) >> (modEnv increaseScope) >> eval input) defaultSemanticState
-    let wrappedCode = "int main() {\n" ++ indent code ++ "\n    return 0;\n}"
-    return $ (preCode) ++ "\n\n" ++ wrappedCode
+runSemantics :: (SemanticsEvaluable a) => SemanticsState -> a -> Result (String, SemanticsState)
+runSemantics inpState input = do
+    ((code, _), s) <- runStateT (eval input) inpState
+    return (code, s)
 
 
 cBinOp :: String -> String -> String -> String
@@ -226,49 +242,61 @@ instance SemanticsEvaluable ASTDecl where
 
 
 
-generateCodeASTExpr (ASTExprBinOp op x1 x2) = do
+generateCodeASTExpr (ASTExprBinOp op x1 x2 ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (x1, env)
     ((x1s, _), t1) <- runEval (eval depVal0) depEnv0
+    assign psState ps
     let (depVal1, depEnv1) = (x2, env)
     ((x2s, _), t2) <- runEval (eval depVal1) depEnv1
+    assign psState ps
     var <- forceMaybe ("Operator " ++ op ++ " does not exist for types " ++ show t1 ++ " and " ++ show t2) $ getStaticFunc op [t1, t2] env
     let rType = var ^. varType
     return (cBinOp x1s x2s (cVar var), rType)
 
-generateCodeASTExpr (ASTExprInt x) = do
+generateCodeASTExpr (ASTExprInt x ps) = do
     env <- use volatileState
+    assign psState ps
     return (cInt x, BaseType "int")
 
-generateCodeASTExpr (ASTExprBool b) = do
+generateCodeASTExpr (ASTExprBool b ps) = do
     env <- use volatileState
+    assign psState ps
     return (cBool b, BaseType "boolean")
 
-generateCodeASTExpr (ASTExprVar name) = do
+generateCodeASTExpr (ASTExprVar name ps) = do
     env <- use volatileState
+    assign psState ps
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require ("Variable " ++ name ++ " defined but not initialised") $ _defined var
     return (cVar var, BaseType "int")
 
-generateCodeASTExpr (ASTExprUnOp "!" x) = do
+generateCodeASTExpr (ASTExprUnOp "!" x ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (x, env)
     ((xs, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "boolean") ++ ", got " ++ show depType0) $ depType0 == BaseType "boolean"
+    assign psState ps
     return (cUnOp xs "!", BaseType "boolean")
 
-generateCodeASTExpr (ASTExprUnOp "-" x) = do
+generateCodeASTExpr (ASTExprUnOp "-" x ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (x, env)
     ((xs, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
+    assign psState ps
     return (cUnOp xs "-", BaseType "int")
 
-generateCodeASTCommand (ASTAssign name x) = do
+generateCodeASTCommand (ASTAssign name x ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (x, env)
     ((xs, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
+    assign psState ps
     var <- forceMaybe ("No such variable " ++ name) $ getVar name env
     require "Cannot assign to a constant variable" $ not $ _const var
     let env' = if not $ _defined var then makeDefined var env else env
@@ -276,83 +304,103 @@ generateCodeASTCommand (ASTAssign name x) = do
     assign volatileState $ snd output
     return (fst output, CommandType)
 
-generateCodeASTCommand (ASTCall name args) = do
+generateCodeASTCommand (ASTCall name args ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (args, env)
     ((argsS, _), types) <- runEval (evalFold False depVal0) depEnv0
+    assign psState ps
     var <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getStaticFunc name types env
     return (cCall var argsS, CommandType)
 
-generateCodeASTCommand (ASTIf cond tCmd fCmd) = do
+generateCodeASTCommand (ASTIf cond tCmd fCmd ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (cond, env)
     ((condS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "boolean") ++ ", got " ++ show depType0) $ depType0 == BaseType "boolean"
+    assign psState ps
     let (depVal1, depEnv1) = (tCmd, env)
     ((tCmdS, _), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType1) $ depType1 == CommandType
+    assign psState ps
     let (depVal2, depEnv2) = (fCmd, env)
     ((fCmdS, _), depType2) <- runEval (eval depVal2) depEnv2
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType2) $ depType2 == CommandType
+    assign psState ps
     return (cSimpleIf condS tCmdS fCmdS, CommandType)
 
-generateCodeASTCommand (ASTWhile cond cmd) = do
+generateCodeASTCommand (ASTWhile cond cmd ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (cond, env)
     ((condS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "boolean") ++ ", got " ++ show depType0) $ depType0 == BaseType "boolean"
+    assign psState ps
     let (depVal1, depEnv1) = (cmd, env)
     ((cmdS, _), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType1) $ depType1 == CommandType
+    assign psState ps
     return (cWhile condS cmdS, CommandType)
 
-generateCodeASTCommand (ASTLet decls cmd) = do
+generateCodeASTCommand (ASTLet decls cmd ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (decls, env)
     ((declsS, env'), depType0) <- runEval (evalFold True depVal0) depEnv0
     require ("Expected " ++ show (CommandType) ++ "'s, got " ++ show depType0) $ all (==CommandType) depType0
+    assign psState ps
     let (depVal1, depEnv1) = (cmd, increaseScope env')
     ((cmdS, env''), depType1) <- runEval (eval depVal1) depEnv1
     require ("Expected " ++ show (CommandType) ++ ", got " ++ show depType1) $ depType1 == CommandType
+    assign psState ps
     let output = (cBlock $ cSeq $ declsS ++ [cmdS], decreaseScope env'')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
-generateCodeASTCommand (ASTSeq cmds) = do
+generateCodeASTCommand (ASTSeq cmds ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (cmds, env)
     ((cmdsS, env'), depType0) <- runEval (evalFold True depVal0) depEnv0
     require ("Expected " ++ show (CommandType) ++ "'s, got " ++ show depType0) $ all (==CommandType) depType0
+    assign psState ps
     let output = (cSeq cmdsS, env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
-generateCodeASTCommand (ASTPass) = do
+generateCodeASTCommand (ASTPass ps) = do
     env <- use volatileState
+    assign psState ps
     return (cPass, CommandType)
 
-generateCodeASTDecl (ASTDeclConst name val) = do
+generateCodeASTDecl (ASTDeclConst name val ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (val, env)
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
+    assign psState ps
     (var, env') <- addVar name (True, True) (BaseType "int") env
     let output = (cCreateVar var (Just valS), env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
-generateCodeASTDecl (ASTDeclVar name Nothing) = do
+generateCodeASTDecl (ASTDeclVar name Nothing ps) = do
     env <- use volatileState
+    assign psState ps
     (var, env') <- addVar name (False, False) (BaseType "int") env
     let output = (cCreateVar var Nothing, env')
     assign volatileState $ snd output
     return (fst output, CommandType)
 
-generateCodeASTDecl (ASTDeclVar name (Just val)) = do
+generateCodeASTDecl (ASTDeclVar name (Just val) ps) = do
     env <- use volatileState
+    assign psState ps
     let (depVal0, depEnv0) = (val, env)
     ((valS, _), depType0) <- runEval (eval depVal0) depEnv0
     require ("Expected " ++ show (BaseType "int") ++ ", got " ++ show depType0) $ depType0 == BaseType "int"
+    assign psState ps
     (var, env') <- addVar name (True, False) (BaseType "int") env
     let output = (cCreateVar var (Just valS), env')
     assign volatileState $ snd output

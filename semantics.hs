@@ -6,7 +6,7 @@ import Data.HashMap.Strict
 data SemanticsDef =
     SemanticsDef{ _semanticsBaseTypes :: HashMap String String
                 , _semanticsParamTypes :: HashMap String String
-                , _semanticsStateExtra :: (String, String)
+                , _semanticsStateExtra :: String
                 , _semanticsVarExtra :: String
                 , _semanticsStandardEnv :: String
                 , _semanticsRules :: [SemanticsRule]

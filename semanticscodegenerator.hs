@@ -19,23 +19,26 @@ unindent = reindent 0
 
 generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> Maybe String -> SemanticsDef -> String
 generateSemanticsCode name parserName imports preCode outPreCode
-    (SemanticsDef baseTypes paramTypes stateExtra varExtra stateDef rules astTypes) =
+    (SemanticsDef baseTypes paramTypes stateExtra varExtra env rules astTypes) =
     intercalate "\n\n"
         [ generateModuleCode name
         , generateImportsCode parserName imports
         , generateTypeCode baseTypes paramTypes
-        , generateStateTypeCode stateExtra varExtra
+        , generateStateTypeCode stateExtra varExtra env
         , unindent $ fromMaybe "" preCode
+        , generateOutPreCode outPreCode
         , classCode
         , utilsCode
-        , generateEntryPoint outPreCode stateDef
+        , entryPoint
         , cPresetsCode
         , generateInstanceCode astTypes
         , generateRulesCode rules
         ]
 
 generateModuleCode :: String -> String
-generateModuleCode name = "module " ++ name ++ " (runSemantics) where"
+generateModuleCode name = "module " ++ name ++
+    " (runSemantics, rDefaultState, _outPreCode, indent, " ++
+    "VolatileState (..), PersistentState (..), SemanticsState (..)) where"
 
 generateImportsCode :: String -> Maybe String -> String
 generateImportsCode parserName mImports =
@@ -45,13 +48,14 @@ generateImportsCode parserName mImports =
     "import Control.Lens\n" ++
     "import ParserRequirements\n" ++
     "import Data.HashMap.Strict\n" ++
-    "import Data.List\n" ++
+    "import Data.List hiding (union)\n" ++
     "import Data.Hashable\n" ++
     "import Data.Maybe\n" ++
+    "import Data.Monoid\n" ++
     unindent (fromMaybe "" mImports)
 
-generateStateTypeCode :: (String, String) -> String -> String
-generateStateTypeCode (st, sd) vt =
+generateStateTypeCode :: String -> String -> String -> String
+generateStateTypeCode st vt env =
     "type StateExtra = " ++ trim st ++ "\n" ++
     "type VarExtra = " ++ trim vt ++ "\n" ++
     "data PersistentState = PersistentState{ _nameCounter :: Int }\n" ++
@@ -80,18 +84,30 @@ generateStateTypeCode (st, sd) vt =
     "                                  , _staticFuncs :: HashMap (String, [VarType]) [Var ()]\n" ++
     "                                  , _stateExtra :: StateExtra\n" ++
     "                                  } deriving Show\n" ++
-    "data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState }\n" ++
+    "instance Semigroup VolatileState where\n" ++
+    "    (VolatileState vs1 _ fs1 e1) <> (VolatileState vs2 _ fs2 e2) = VolatileState (union vs2 vs1) 0 (union fs2 fs1) (e1 <> e2)\n" ++
+    "instance Monoid VolatileState where\n" ++
+    "    mempty = VolatileState empty (-1) empty mempty\n" ++
+    "data SemanticsState = SemanticsState{ _persistentState :: PersistentState, _volatileState :: VolatileState, _psState :: ParseState }\n" ++
     "type StateResult a = StateT SemanticsState Result a\n" ++
-    "defaultSemanticState = SemanticsState (PersistentState 0) $ VolatileState empty (-1) empty $ " ++ trim sd ++ "\n" ++
+    "defaultPersistentState = PersistentState 0\n" ++
     "makeLenses ''SemanticsState\n" ++
     "makeLenses ''PersistentState\n" ++
     "makeLenses ''VolatileState\n" ++
     "makeLenses ''Var\n" ++
-    "makeLenses ''VarType\n"
+    "makeLenses ''VarType\n" ++
+    "rDefaultState :: Result SemanticsState\n" ++
+    "rDefaultState = fmap snd $ runStateT (" ++ env ++ " >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState \"\")\n"
 
 classCode :: String
 classCode = "class SemanticsEvaluable a where\n" ++
             "    eval :: a -> StateResult (String, VarType)"
+
+generateOutPreCode :: Maybe String -> String
+generateOutPreCode mp = "_outPreCode :: String\n" ++
+                        "_outPreCode = " ++ case mp of
+                            Just p -> p ++ " ++ \"\\n\\n\"\n"
+                            Nothing -> "\"\"\n"
 
 utilsCode :: String
 utilsCode = "incrementCounter :: StateResult Int\n" ++
@@ -99,11 +115,13 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "   n <- use $ persistentState . nameCounter\n"  ++
             "   modifying (persistentState . nameCounter) (+1)\n" ++
             "   return n\n" ++
+            "err :: String -> StateResult a\n" ++
+            "err errMsg = use psState >>= \\ps -> lift $ Error $ errMsg ++ \" at \" ++ showPos ps\n\n" ++
             "require :: String -> Bool -> StateResult ()\n" ++
             "require _ True = return ()\n" ++
-            "require errMsg False = lift $ Error errMsg\n\n" ++
+            "require errMsg False = err errMsg\n\n" ++
             "forceMaybe :: String -> Maybe a -> StateResult a\n" ++
-            "forceMaybe errMsg Nothing = lift $ Error errMsg\n" ++
+            "forceMaybe errMsg Nothing = err errMsg\n" ++
             "forceMaybe _ (Just a) = return a\n\n" ++
             "evalFold :: (SemanticsEvaluable a) => Bool -> [a] -> StateResult ([String], [VarType])\n" ++
             "evalFold _ [] = return ([], [])\n" ++
@@ -167,16 +185,12 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "modEnv :: (VolatileState -> VolatileState) -> StateResult ()\n" ++
             "modEnv f = modifying volatileState f"
 
-generateEntryPoint :: Maybe String -> String -> String
-generateEntryPoint outPreCode stateDef = unlines [
-    "runSemantics :: (SemanticsEvaluable a) => a -> Result String",
-    "runSemantics input = do",
-    "    ((code, _), _) <- runStateT ((" ++ stateDef ++ ") >> (modEnv increaseScope) >> eval input) defaultSemanticState",
-    "    let wrappedCode = \"int main() {\\n\" ++ indent code ++ \"\\n    return 0;\\n}\"",
-    (case outPreCode of
-         Nothing -> "    return wrappedCode"
-         Just s  -> "    return $ (" ++ s ++ ") ++ \"\\n\\n\" ++ wrappedCode"
-    )
+entryPoint :: String
+entryPoint = unlines [
+    "runSemantics :: (SemanticsEvaluable a) => SemanticsState -> a -> Result (String, SemanticsState)",
+    "runSemantics inpState input = do",
+    "    ((code, _), s) <- runStateT (eval input) inpState",
+    "    return (code, s)"
     ]
 
 cPresetsCode :: String
@@ -269,6 +283,7 @@ generateDepTypeCode (BuiltSemanticsDepTypeCompare t) depTypeStr _ =
 generateDepsCode :: Int -> [SemanticsRuleDependency] -> String
 generateDepsCode i [] = ""
 generateDepsCode i ((SemanticsRuleDependency input output outputType usesEnv depType):ds) =
+    "    assign psState ps\n" ++
     evalCode ++ "\n" ++
     typeCode ++
     rest
@@ -278,7 +293,6 @@ generateDepsCode i ((SemanticsRuleDependency input output outputType usesEnv dep
     depTypeStr = genererateDepType outputType i
     evalCode = generateDepEvalCode depType inputStr outputStr depTypeStr i
     typeCode = generateDepTypeCode outputType depTypeStr depType
-
     rest = generateDepsCode (i + 1) ds
 
 generateRestrictionsCode :: [SemanticsTypeRestriction] -> String
@@ -304,6 +318,7 @@ generateRulesCode (r:rs) =
            , ") = do\n"
            , "    env <- use volatileState\n"
            , depsCode
+           , "    assign psState ps\n"
            , restrictCode
            , whereCode
            , ret, "\n\n"

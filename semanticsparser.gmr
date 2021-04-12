@@ -55,8 +55,8 @@ BaseType :: baseType identifier stringLit                        { (v2, v3) }
 
 ParamType :: paramType identifier identifier                     { (v2, v3) }
 
-StateExtra :: stateExtra CodeBlock CodeBlock                     { (v2, v3) }
-            | %empty                                             { ("()", "()") }
+StateExtra :: stateExtra CodeBlock                               { v2 }
+            | %empty                                             { "()" }
 
 VarExtra :: varExtra CodeBlock                                   { v2 }
           | %empty                                               { "()" }

@@ -33,6 +33,9 @@ makeStandardEnv = do
     mapM (addOp "int" "int") intOps
     mapM (addOp "int" "boolean") intCompOps
     mapM (addOp "boolean" "boolean") boolCompOps
+    env <- use volatileState
+    (_, env') <- addVar "test" (False, False) (BaseType "int") env
+    assign volatileState env'
 }
 %outputprecode preCode
 %basetype int "int"
@@ -42,7 +45,7 @@ makeStandardEnv = do
 
 %asttype ASTExpr
 
-case { ASTExprBinOp op x1 x2 } -> { cBinOp x1s x2s (cVar var) } @ rType
+case { ASTExprBinOp op x1 x2 ps } -> { cBinOp x1s x2s (cVar var) } @ rType
     evaluating
         x1 -> x1s @ t1
         x2 -> x2s @ t2
@@ -52,28 +55,28 @@ case { ASTExprBinOp op x1 x2 } -> { cBinOp x1s x2s (cVar var) } @ rType
             let rType = var ^. varType
         }
 
-case { ASTExprInt x } -> { cInt x } @ "int"
+case { ASTExprInt x ps } -> { cInt x } @ "int"
 
-case { ASTExprBool b } -> { cBool b } @ "boolean"
+case { ASTExprBool b ps } -> { cBool b } @ "boolean"
 
-case { ASTExprVar name } -> { cVar var } @ "int"
+case { ASTExprVar name ps } -> { cVar var } @ "int"
     where
         {
             var <- forceMaybe ("No such variable " ++ name) $ getVar name env
             require ("Variable " ++ name ++ " defined but not initialised") $ _defined var
         }
 
-case { ASTExprUnOp "!" x } -> { cUnOp xs "!" } @ "boolean"
+case { ASTExprUnOp "!" x ps } -> { cUnOp xs "!" } @ "boolean"
     evaluating
         x -> xs @ "boolean"
 
-case { ASTExprUnOp "-" x } -> { cUnOp xs "-" } @ "int"
+case { ASTExprUnOp "-" x ps } -> { cUnOp xs "-" } @ "int"
     evaluating
         x -> xs @ "int"
 
 %asttype ASTCommand
 
-case { ASTAssign name x } => { (cAssignVar var xs, env') }
+case { ASTAssign name x ps } => { (cAssignVar var xs, env') }
     evaluating
         x -> xs @ "int"
     where
@@ -83,7 +86,7 @@ case { ASTAssign name x } => { (cAssignVar var xs, env') }
             let env' = if not $ _defined var then makeDefined var env else env
         }
 
-case { ASTCall name args } -> { cCall var argsS }
+case { ASTCall name args ps } -> { cCall var argsS }
     evaluating
         args *-> argsS @ types
     where
@@ -91,31 +94,31 @@ case { ASTCall name args } -> { cCall var argsS }
             var <- forceMaybe ("Function " ++ name ++ " does not exist for args " ++ (intercalate ", " $ fmap show types)) $ getStaticFunc name types env
         }
 
-case { ASTIf cond tCmd fCmd } -> { cSimpleIf condS tCmdS fCmdS }
+case { ASTIf cond tCmd fCmd ps } -> { cSimpleIf condS tCmdS fCmdS }
     evaluating
         cond -> condS @ "boolean"
         tCmd -> tCmdS
         fCmd -> fCmdS
 
-case { ASTWhile cond cmd } -> { cWhile condS cmdS }
+case { ASTWhile cond cmd ps } -> { cWhile condS cmdS }
     evaluating
         cond -> condS @ "boolean"
         cmd -> cmdS
 
-case { ASTLet decls cmd } => { (cBlock $ cSeq $ declsS ++ [cmdS], decreaseScope env'') }
+case { ASTLet decls cmd ps } => { (cBlock $ cSeq $ declsS ++ [cmdS], decreaseScope env'') }
     evaluating
         { (decls, env) } ^=> { (declsS, env') }
         { (cmd, increaseScope env') } => { (cmdS, env'') }
 
-case { ASTSeq cmds } => { (cSeq cmdsS, env') }
+case { ASTSeq cmds ps } => { (cSeq cmdsS, env') }
     evaluating
         { (cmds, env) } ^=> { (cmdsS, env') }
 
-case { ASTPass } -> { cPass }
+case { ASTPass ps } -> { cPass }
 
 %asttype ASTDecl
 
-case { ASTDeclConst name val } => { (cCreateVar var (Just valS), env') }
+case { ASTDeclConst name val ps } => { (cCreateVar var (Just valS), env') }
     evaluating
         val -> valS @ "int"
     where
@@ -123,13 +126,13 @@ case { ASTDeclConst name val } => { (cCreateVar var (Just valS), env') }
             (var, env') <- addVar name (True, True) (BaseType "int") env
         }
 
-case { ASTDeclVar name Nothing } => { (cCreateVar var Nothing, env') }
+case { ASTDeclVar name Nothing ps } => { (cCreateVar var Nothing, env') }
     where
         {
             (var, env') <- addVar name (False, False) (BaseType "int") env
         }
 
-case { ASTDeclVar name (Just val) } => { (cCreateVar var (Just valS), env') }
+case { ASTDeclVar name (Just val) ps } => { (cCreateVar var (Just valS), env') }
     evaluating
         val -> valS @ "int"
     where

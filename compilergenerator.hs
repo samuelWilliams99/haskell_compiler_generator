@@ -6,14 +6,19 @@ import System.Directory
 import System.Environment
 import System.FilePath.Posix
 import Data.Char
+import Data.Maybe
 import Semanticsparser
 import Semantics
 import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- error source poses would be nice
--- something for includes?
+-- includes:
+--     add a flag to deciding if you want to support includes
+--     add a way to specify a map on the env when including, so includes are now [(String, VolatileState -> VolatileState)], rather than [String]
+--         allows stuff like "import (func1, func2) from File", or "import File hiding (func1)"
+--         can have some nice presets for whitelisting, blacklisting, renaming, etc.
+--     ensure errors specify what file they came from
 
 lowerStr :: String -> String
 lowerStr = map toLower
