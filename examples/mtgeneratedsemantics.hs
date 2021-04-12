@@ -88,9 +88,6 @@ makeStandardEnv = do
     mapM (addOp "int" "int") intOps
     mapM (addOp "int" "boolean") intCompOps
     mapM (addOp "boolean" "boolean") boolCompOps
-    env <- use volatileState
-    (_, env') <- addVar "test" (False, False) (BaseType "int") env
-    assign volatileState env'
 
 _outPreCode :: String
 _outPreCode = preCode ++ "\n\n"

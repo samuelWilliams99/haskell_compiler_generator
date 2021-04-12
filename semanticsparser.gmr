@@ -33,12 +33,13 @@ handleStatements stmts = aux stmts ""
       preCode       { TokenCustom "Directive" "precode" }
       outputPreCode { TokenCustom "Directive" "outputprecode" }
       standardEnv   { TokenCustom "Directive" "standardenv" }
+      hasIncludes   { TokenCustom "Directive" "hasincludes" }
 
 Main :: Extension Imports? PreCode? OutPreCode? SemanticsDef     { (v1, v2, v3, v4, v5) }
 
 SemanticsDef :: BaseType+ ParamType*
                 StateExtra VarExtra
-                StandardEnv Stmts                                { uncurry (SemanticsDef (fromList v1) (fromList v2) v3 v4 v5) $ handleStatements v6 }
+                StandardEnv HasIncludes Stmts                    { uncurry (SemanticsDef (fromList v1) (fromList v2) v3 v4 v5 v6) $ handleStatements v7 }
 
 Extension :: extension identifier                                { v2 }
 
@@ -62,6 +63,8 @@ VarExtra :: varExtra CodeBlock                                   { v2 }
           | %empty                                               { "()" }
 
 StandardEnv :: standardEnv CodeBlock                             { v2 }
+
+HasIncludes :: hasIncludes { True } | %empty { False }
 
 Stmts :: AstType Stmt+                                           { (Right v1):v2 }
 

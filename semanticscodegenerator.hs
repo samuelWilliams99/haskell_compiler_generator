@@ -19,7 +19,7 @@ unindent = reindent 0
 
 generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> Maybe String -> SemanticsDef -> String
 generateSemanticsCode name parserName imports preCode outPreCode
-    (SemanticsDef baseTypes paramTypes stateExtra varExtra env rules astTypes) =
+    (SemanticsDef baseTypes paramTypes stateExtra varExtra env _ rules astTypes) =
     intercalate "\n\n"
         [ generateModuleCode name
         , generateImportsCode parserName imports

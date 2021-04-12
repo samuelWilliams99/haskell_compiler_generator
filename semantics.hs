@@ -9,6 +9,7 @@ data SemanticsDef =
                 , _semanticsStateExtra :: String
                 , _semanticsVarExtra :: String
                 , _semanticsStandardEnv :: String
+                , _semanticsHasIncludes :: Bool
                 , _semanticsRules :: [SemanticsRule]
                 , _semanticsAstTypes :: [String]
                 } deriving Show
