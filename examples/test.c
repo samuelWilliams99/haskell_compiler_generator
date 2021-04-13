@@ -3,6 +3,8 @@ void printInt(int x) { printf("%d\n", x); }
 
 
 int main() {
+    printInt(4);
+    
     {
         int var0 = 0;
         int var1 = 10;
@@ -16,5 +18,6 @@ int main() {
             }
         }
     }
+    
     return 0;
 }

@@ -1,3 +1,4 @@
+include "test2"
 let
     var n := 0;
     var count := 10

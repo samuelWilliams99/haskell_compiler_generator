@@ -1,6 +1,6 @@
-module MtGeneratedSemantics (runSemantics, rDefaultState, _outPreCode, indent, VolatileState (..), PersistentState (..), SemanticsState (..)) where
+module MtSemantics (runSemantics, rDefaultState, _outPreCode, indent, VolatileState (..), PersistentState (..), SemanticsState (..)) where
 
-import MtGeneratedParser
+import MtParser
 import Control.Monad.Trans.State.Lazy
 import Control.Monad.Trans.Class
 import Control.Lens

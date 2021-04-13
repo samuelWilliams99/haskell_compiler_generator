@@ -31,6 +31,10 @@ unwrapOp (TokenOperator s) = s
 %left "&&"
 %left "||"
 
+Root :: Include* Command { (v2, v1) }
+
+Include :: include stringLit { v2 }
+
 Command :: identifier ":=" Expression                         { ASTAssign v1 v3 ps1 }
          | identifier "(" Expression+(",") ")"                { ASTCall v1 v3 ps1 }
          | if Expression then Command else Command            { ASTIf v2 v4 v6 ps1 }

@@ -17,7 +17,6 @@ import MainCodeGenerator
 --     add a way to specify a map on the env when including, so includes are now [(String, VolatileState -> VolatileState)], rather than [String]
 --         allows stuff like "import (func1, func2) from File", or "import File hiding (func1)"
 --         can have some nice presets for whitelisting, blacklisting, renaming, etc. - less easy
---     ensure errors specify what file they came from - kinda easy
 
 lowerStr :: String -> String
 lowerStr = map toLower
@@ -41,15 +40,15 @@ runCompilerGenerator path = do
         case generateCompiler gmrContent smtContent modulePrefix  of
             Error e -> putStrLn e
             Result (parser, semantics, mainCode) -> do
-                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "generatedparser.hs") parser
+                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "parser.hs") parser
                 writeFile (replaceFileName path "parserrequirements.hs") parserRequirements
-                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "generatedsemantics.hs") semantics
-                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "generatedcompiler.hs") mainCode
+                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "semantics.hs") semantics
+                writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "compiler.hs") mainCode
 
 generateCompiler :: String -> String -> String -> Result (String, String, String)
 generateCompiler gmr smt modulePrefix = do
-    let parserModule = modulePrefix ++ "GeneratedParser"
-    let semanticsModule = modulePrefix ++ "GeneratedSemantics"
+    let parserModule = modulePrefix ++ "Parser"
+    let semanticsModule = modulePrefix ++ "Semantics"
     parserCode <- eitherToResult $ generateParser gmr parserModule
     (semanticsCode, ext, hasIncludes) <- generateSemantics smt parserModule semanticsModule
     let mainCode = generateMainCode parserModule semanticsModule ext hasIncludes

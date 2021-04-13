@@ -39,6 +39,7 @@ makeStandardEnv = do
 %basetype boolean "int"
 %varextra { (Bool, Bool) }
 %standardenv makeStandardEnv
+%hasincludes
 
 %asttype ASTExpr
 
