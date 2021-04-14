@@ -38,7 +38,7 @@ generateSemanticsCode name parserName imports preCode outPreCode
 generateModuleCode :: String -> String
 generateModuleCode name = "module " ++ name ++
     " (runSemantics, rDefaultState, _outPreCode, indent, " ++
-    "VolatileState (..), PersistentState (..), SemanticsState (..)) where"
+    "VolatileState (..), PersistentState (..), SemanticsState (..), Var (..)) where"
 
 generateImportsCode :: String -> Maybe String -> String
 generateImportsCode parserName mImports =

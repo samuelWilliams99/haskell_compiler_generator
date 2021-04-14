@@ -13,11 +13,6 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- includes:
---     add a way to specify a map on the env when including, so includes are now [(String, VolatileState -> VolatileState)], rather than [String]
---         allows stuff like "import (func1, func2) from File", or "import File hiding (func1)"
---         can have some nice presets for whitelisting, blacklisting, renaming, etc. - less easy
-
 lowerStr :: String -> String
 lowerStr = map toLower
 
@@ -45,15 +40,39 @@ runCompilerGenerator path = do
                 writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "semantics.hs") semantics
                 writeFile (replaceFileName path $ (lowerStr modulePrefix) ++ "compiler.hs") mainCode
 
+includeMapsCode :: String
+includeMapsCode = unlines [
+    "data IncludeMap = IncludeMap{ _includeMapType :: IncludeMapType",
+    "                            , _nextIncludeMap :: Maybe IncludeMap } deriving Show",
+    "data IncludeMapType = IncludeMapEverything | IncludeMapWhitelist [String] | IncludeMapBlacklist [String] | IncludeMapRename [(String, String)] deriving Show",
+    "infixr 0 `andThen`",
+    "andThen :: IncludeMap -> IncludeMap -> IncludeMap",
+    "andThen a b = a { _nextIncludeMap = Just b }",
+    "everything :: IncludeMap",
+    "everything = IncludeMap IncludeMapEverything Nothing",
+    "whitelist :: [String] -> IncludeMap",
+    "whitelist xs = IncludeMap (IncludeMapWhitelist xs) Nothing",
+    "blacklist :: [String] -> IncludeMap",
+    "blacklist xs = IncludeMap (IncludeMapBlacklist xs) Nothing",
+    "rename :: [(String, String)] -> IncludeMap",
+    "rename ns = IncludeMap (IncludeMapRename ns) Nothing"
+    ]
+
+exportsMap :: Maybe String -> Maybe String
+exportsMap Nothing = Just "IncludeMap (..), IncludeMapType (..)"
+exportsMap (Just e) = Just $ e ++ ", IncludeMap (..), IncludeMapType (..)"
+
 generateCompiler :: String -> String -> String -> Result (String, String, String)
 generateCompiler gmr smt modulePrefix = do
     let parserModule = modulePrefix ++ "Parser"
     let semanticsModule = modulePrefix ++ "Semantics"
-    parserCode <- eitherToResult $ generateParser gmr parserModule
     (semanticsCode, ext, hasIncludes) <- generateSemantics smt parserModule semanticsModule
+    parserCode <- eitherToResult $ generateParser gmr parserModule $ if hasIncludes then exportsMap else id
     let mainCode = generateMainCode parserModule semanticsModule ext hasIncludes
 
-    return (parserCode, semanticsCode, mainCode)
+    let parserCode' = if hasIncludes then parserCode ++ "\n\n" ++ includeMapsCode else parserCode
+
+    return (parserCode', semanticsCode, mainCode)
 
 generateSemantics :: String -> String -> String -> Result (String, String, Bool)
 generateSemantics smt parserName name = do

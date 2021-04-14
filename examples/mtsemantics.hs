@@ -1,4 +1,4 @@
-module MtSemantics (runSemantics, rDefaultState, _outPreCode, indent, VolatileState (..), PersistentState (..), SemanticsState (..)) where
+module MtSemantics (runSemantics, rDefaultState, _outPreCode, indent, VolatileState (..), PersistentState (..), SemanticsState (..), Var (..)) where
 
 import MtParser
 import Control.Monad.Trans.State.Lazy

@@ -5,8 +5,8 @@ import System.Environment
 import System.FilePath.Posix
 import System.Console.GetOpt
 import System.Exit
-import Data.HashMap.Strict hiding (filter)
-import Data.List hiding (insert)
+import Data.HashMap.Strict as Map
+import Data.List as List hiding (insert, delete)
 import Data.Ord
 import Data.Maybe (fromMaybe)
 import Data.Foldable (asum)
@@ -53,12 +53,34 @@ main = do
 resultToIO :: Result a -> IO a
 resultToIO (Error e) = die e
 resultToIO (Result a) = return a
+volatileStateFilterNames :: (String -> Bool) -> VolatileState -> VolatileState
+volatileStateFilterNames f vs = vs { _vars = filterWithKey (\k _ -> f k) (_vars vs),
+                                     _staticFuncs = filterWithKey (\(k, _) _ -> f k) (_staticFuncs vs) }
+getIncludeMap :: IncludeMapType -> (VolatileState -> VolatileState)
+getIncludeMap IncludeMapEverything vs = vs
+getIncludeMap (IncludeMapWhitelist ks) vs = volatileStateFilterNames (\k -> elem k ks) vs
+getIncludeMap (IncludeMapBlacklist ks) vs = volatileStateFilterNames (\k -> not $ elem k ks) vs
+getIncludeMap (IncludeMapRename ns) vs =
+    vs { _vars = foldrWithKey (\k v m ->
+             if member k nm then Map.insert (nm ! k) v $ delete k m else m
+         ) vars vars
+       , _staticFuncs = foldrWithKey (\(k, as) v m ->
+             if member k nm then Map.insert (nm ! k, as) v $ delete (k, as) m else m
+         ) funcs funcs
+       }
+  where
+    nm = fromList ns
+    vars = _vars vs
+    funcs = _staticFuncs vs
+computeIncludeMap :: IncludeMap -> (VolatileState -> VolatileState)
+computeIncludeMap (IncludeMap t Nothing) = getIncludeMap t
+computeIncludeMap (IncludeMap t (Just next)) = computeIncludeMap next . getIncludeMap t
 getRealPath :: [String] -> String -> IO String
 getRealPath deps path = do
     paths' <- mapM (canonicalizePath . (</> (path -<.> "mt"))) ("":deps)
     let paths = nub paths'
     exists <- mapM doesFileExist paths
-    let validPaths = fmap snd $ filter fst $ zip exists paths
+    let validPaths = fmap snd $ List.filter fst $ zip exists paths
     if validPaths == [] then
         die $ "Could not find file \"" ++ path ++ "\""
     else if length validPaths == 1 then do
@@ -95,30 +117,36 @@ getIncludeOrder m = case hasCycles m of
 showPath :: String -> Result a -> Result a
 showPath _ (Result a) = Result a
 showPath path (Error e) = Error $ path ++ " =>\n" ++ indent e
-getParseTrees :: Bool -> [String] -> String -> [String] -> IO (HashMap String (ASTCommand, [String]))
+getParseTrees :: Bool -> [String] -> String -> [String] -> IO (HashMap String (ASTCommand, [(String, VolatileState -> VolatileState)]))
 getParseTrees verbose deps path visited = do
     content <- readFile path
     logV verbose $ "Parsing " ++ path
     (syntax, includes) <- resultToIO $ showPath path $ runParser content
-    realIncludes <- mapM (getRealPath deps) includes
-    let newIncludes = filter (\include -> not $ elem include (path:visited)) realIncludes
+    realIncludes <- mapM (\(i, im) -> fmap (\i' -> (i', computeIncludeMap im)) $ getRealPath deps i) includes
+    let newIncludes = List.filter (\include -> not $ elem include (path:visited)) $ fmap fst realIncludes
     ms <- mapM (\p -> getParseTrees verbose deps p ([path] ++ newIncludes ++ visited)) newIncludes
-    return $ insert path (syntax, realIncludes) $ unions ms
-getSemantics :: [(String, ASTCommand, [String])] -> Bool -> Int -> VolatileState -> HashMap String VolatileState -> PersistentState -> IO String
+    return $ Map.insert path (syntax, realIncludes) $ unions ms
+removeGlobals :: HashMap a [Var b] -> HashMap a [Var b]
+removeGlobals m = fmap (pure . setScope . head) $ Map.filter ((>0) . length) $ fmap (List.filter ((/=(-1)) . _varScopeLevel)) m
+    where setScope v = v { _varScopeLevel = -1 }
+cleanVolitileState :: VolatileState -> VolatileState
+cleanVolitileState vs = vs { _vars = removeGlobals $ _vars vs, _staticFuncs = removeGlobals $ _staticFuncs vs }
+getSemantics :: [(String, ASTCommand, [(String, VolatileState -> VolatileState)])] -> Bool -> Int -> VolatileState -> HashMap String VolatileState -> PersistentState -> IO String
 getSemantics [] _ _ _ _ _ = return ""
 getSemantics ((p, cmd, includes):fs) verbose i def sm pState = do
-    let vStates = def:(fmap (sm !) includes)
+    let vStates = def:(fmap (\(path, f) -> f (sm ! path)) includes)
     let vState = mconcat vStates
     logV verbose $ "[" ++ show i ++ " of " ++ show (i + length fs) ++ "] Compiling " ++ p
-    (c, SemanticsState pState' vState' _) <- resultToIO $ showPath p $ runSemantics (SemanticsState pState vState $ parseState "") cmd
-    c' <- getSemantics fs verbose (i+1) def (insert p vState' sm) pState'
+    (c, SemanticsState pStateOut vStateOut _) <- resultToIO $ showPath p $ runSemantics (SemanticsState pState vState $ parseState "") cmd
+    let vStateOut' = cleanVolitileState vStateOut
+    c' <- getSemantics fs verbose (i+1) def (Map.insert p vStateOut' sm) pStateOut
     return $ c ++ "\n\n" ++ c'
 compile :: Bool -> [String] -> String -> IO String
 compile verbose deps path = do
     realPath <- getRealPath deps path
     m <- getParseTrees verbose deps realPath []
     logV verbose $ "Finished parsing, found " ++ show (size m) ++ " files"
-    includeOrder <- resultToIO $ getIncludeOrder $ fmap snd m
+    includeOrder <- resultToIO $ getIncludeOrder $ fmap (fmap fst . snd) m
     logV verbose "Resolved dependencies"
     let includeOrder' = [(p, cmd, is) | p <- includeOrder, let (cmd, is) = m ! p]
     (SemanticsState pState vState _) <- resultToIO rDefaultState

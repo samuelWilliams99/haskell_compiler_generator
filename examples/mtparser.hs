@@ -1,4 +1,4 @@
-module MtParser (runParser, module ParserRequirements, ASTCommand (..), ASTExpr (..), ASTDecl (..)) where
+module MtParser (runParser, module ParserRequirements, ASTCommand (..), ASTExpr (..), ASTDecl (..) , IncludeMap (..), IncludeMapType (..)) where
 
 import ParserRequirements
 import Control.Applicative
@@ -1523,7 +1523,7 @@ generatedReduction4 ps0 ((AbsSynResult3 v2 ps2):(AbsSynResult4 v1 ps1):_) = AbsS
 
 generatedReduction5 ps0 ((AbsSynResult4 v1 ps1):_) = AbsSynResult3 ([v1]) ps1
 
-generatedReduction6 ps0 ((AbsSynToken (Token ps2 (TokenStringLit v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult4 (v2) ps1
+generatedReduction6 ps0 ((AbsSynToken (Token ps2 (TokenStringLit v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult4 ((v2, everything)) ps1
 
 generatedReduction7 ps0 ((AbsSynResult9 v3 ps3):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult5 (ASTAssign v1 v3 ps1) ps1
 
@@ -1607,3 +1607,19 @@ generatedReduction46 ps0 ((AbsSynToken (Token ps2 (TokenIdentifier v2))):(AbsSyn
 
 generatedReduction47 ps0 ((AbsSynResult9 v4 ps4):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenIdentifier v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult15 (ASTDeclVar v2 (Just v4) ps1) ps1
 
+
+
+data IncludeMap = IncludeMap{ _includeMapType :: IncludeMapType
+                            , _nextIncludeMap :: Maybe IncludeMap } deriving Show
+data IncludeMapType = IncludeMapEverything | IncludeMapWhitelist [String] | IncludeMapBlacklist [String] | IncludeMapRename [(String, String)] deriving Show
+infixr 0 `andThen`
+andThen :: IncludeMap -> IncludeMap -> IncludeMap
+andThen a b = a { _nextIncludeMap = Just b }
+everything :: IncludeMap
+everything = IncludeMap IncludeMapEverything Nothing
+whitelist :: [String] -> IncludeMap
+whitelist xs = IncludeMap (IncludeMapWhitelist xs) Nothing
+blacklist :: [String] -> IncludeMap
+blacklist xs = IncludeMap (IncludeMapBlacklist xs) Nothing
+rename :: [(String, String)] -> IncludeMap
+rename ns = IncludeMap (IncludeMapRename ns) Nothing
