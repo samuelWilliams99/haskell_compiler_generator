@@ -13,6 +13,11 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
+-- todo
+-- add a modifier for -> that allows to you have it auto increase and decrease scope before and after
+-- 3 modes, non - does nothing, throwaway - increases scope for input and throws away output, keep - increase for input, decrease output and keep
+-- perhaps by prefix ops like ArrowMod :: %empty | "%" | "&", so u get like cmd &-> cmdS
+
 lowerStr :: String -> String
 lowerStr = map toLower
 

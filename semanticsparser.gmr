@@ -37,9 +37,9 @@ handleStatements stmts = aux stmts ""
 
 Main :: Extension Imports? PreCode? OutPreCode? SemanticsDef     { (v1, v2, v3, v4, v5) }
 
-SemanticsDef :: BaseType+ ParamType*
+SemanticsDef :: HasIncludes BaseType+ ParamType*
                 StateExtra VarExtra
-                StandardEnv HasIncludes Stmts                    { uncurry (SemanticsDef (fromList v1) (fromList v2) v3 v4 v5 v6) $ handleStatements v7 }
+                StandardEnv Stmts                    { uncurry (SemanticsDef (fromList v2) (fromList v3) v4 v5 v6 v1) $ handleStatements v7 }
 
 Extension :: extension identifier                                { v2 }
 
@@ -54,7 +54,8 @@ CodeBlock :: codeBlock { v1 } | identifier { v1 } | upperIdentifier { v1 }
 
 BaseType :: baseType identifier stringLit                        { (v2, v3) }
 
-ParamType :: paramType identifier identifier                     { (v2, v3) }
+ParamType :: paramType identifier codeBlock                      { (v2, v3) }
+           | paramType identifier identifier                     { (v2, v3) }
 
 StateExtra :: stateExtra CodeBlock                               { v2 }
             | %empty                                             { "()" }

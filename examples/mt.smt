@@ -35,11 +35,11 @@ makeStandardEnv = do
     mapM (addOp "boolean" "boolean") boolCompOps
 }
 %outputprecode preCode
+%hasincludes
 %basetype int "int"
 %basetype boolean "int"
 %varextra { (Bool, Bool) }
 %standardenv makeStandardEnv
-%hasincludes
 
 %asttype ASTExpr
 
