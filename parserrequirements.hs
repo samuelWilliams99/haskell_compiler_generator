@@ -367,5 +367,10 @@ directive = do
     char '%'
     str <- ident
     return $ TokenCustom "Directive" str
+identifierPrime :: Parser TokenType
+identifierPrime = do
+    name <- ident
+    primes <- some (char '\'')
+    return $ TokenCustom "IdentifierPrime" (name ++ primes)
 languageDefsParser :: Parser TokenType
-languageDefsParser = codeBlock False <|> directive
+languageDefsParser = codeBlock False <|> directive <|> identifierPrime

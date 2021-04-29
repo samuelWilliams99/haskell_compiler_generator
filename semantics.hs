@@ -40,9 +40,10 @@ data SemanticsTypeRestriction = SemanticsTypeRestriction{ _semanticsTypeResName 
 data SemanticsRuleDependencyIterType = SemanticsDepSingle | SemanticsDepFold Bool deriving Show
 
 data SemanticsRuleDependency = SemanticsRuleDependency{ _semanticsDepInput :: String
+                                                      , _semanticsDepInputEnv :: String
                                                       , _semanticsDepOutput :: String
+                                                      , _semanticsDepOutputEnv :: String
                                                       , _semanticsDepOutputType :: SemanticsDepOutputType
-                                                      , _semanticsDepUsesEnv :: Bool
                                                       , _semanticsDepIterType :: SemanticsRuleDependencyIterType
                                                       } deriving Show
 

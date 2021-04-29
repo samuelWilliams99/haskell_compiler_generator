@@ -282,14 +282,14 @@ generateDepTypeCode (BuiltSemanticsDepTypeCompare t) depTypeStr _ =
 
 generateDepsCode :: Int -> [SemanticsRuleDependency] -> String
 generateDepsCode i [] = ""
-generateDepsCode i ((SemanticsRuleDependency input output outputType usesEnv depType):ds) =
+generateDepsCode i ((SemanticsRuleDependency input inputEnv output outputEnv outputType depType):ds) =
     "    assign psState ps\n" ++
     evalCode ++ "\n" ++
     typeCode ++
     rest
   where
-    inputStr = if usesEnv then input else "(" ++ input ++ ", env)"
-    outputStr = if usesEnv then output else "(" ++ output ++ ", _)"
+    inputStr = "(" ++ input ++ ", " ++ inputEnv ++ ")"
+    outputStr = "(" ++ output ++ ", " ++ outputEnv ++ ")"
     depTypeStr = genererateDepType outputType i
     evalCode = generateDepEvalCode depType inputStr outputStr depTypeStr i
     typeCode = generateDepTypeCode outputType depTypeStr depType

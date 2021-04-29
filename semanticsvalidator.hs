@@ -32,7 +32,7 @@ validateBaseVars baseTypes dep = let (RawSemanticsDepType v@(SemanticsStaticBase
                                  else Error $ "Base type " ++ name ++ " is invalid"
 
 validateTypeVars :: [String] -> [SemanticsRuleDependency] -> [SemanticsRuleDependency]
-validateTypeVars seen (d@(SemanticsRuleDependency _ _ (RawSemanticsDepType (SemanticsVarType name)) _ _):ds) =
+validateTypeVars seen (d@(SemanticsRuleDependency _ _ _ _ (RawSemanticsDepType (SemanticsVarType name)) _):ds) =
     (d { _semanticsDepOutputType=oType }):rest
   where
     hasSeen = elem name seen
