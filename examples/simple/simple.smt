@@ -1,11 +1,6 @@
 %extension simple
-%precode {
-    preCode :: String
-    preCode = "#include <stdio.h>"
-}
-%outputprecode preCode
+%outputprecode { "#include <stdio.h>" }
 %basetype integer "int"
-%standardenv { return () }
 
 %asttype SimpleCommands
 

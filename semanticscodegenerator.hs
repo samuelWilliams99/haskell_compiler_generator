@@ -97,7 +97,7 @@ generateStateTypeCode st vt env =
     "makeLenses ''Var\n" ++
     "makeLenses ''VarType\n" ++
     "rDefaultState :: Result SemanticsState\n" ++
-    "rDefaultState = fmap snd $ runStateT (" ++ env ++ " >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState \"\")\n"
+    "rDefaultState = fmap snd $ runStateT (" ++ trim env ++ " >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState \"\")\n"
 
 classCode :: String
 classCode = "class SemanticsEvaluable a where\n" ++

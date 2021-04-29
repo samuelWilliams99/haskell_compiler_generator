@@ -64,6 +64,7 @@ VarExtra :: varExtra CodeBlock                                   { v2 }
           | %empty                                               { "()" }
 
 StandardEnv :: standardEnv CodeBlock                             { v2 }
+             | %empty                                            { "return ()" }
 
 HasIncludes :: hasIncludes { True } | %empty { False }
 

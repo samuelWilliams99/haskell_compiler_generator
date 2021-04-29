@@ -191,7 +191,7 @@ generatedState15 _ _ _ xs = generatedError 15 xs
 
 
 generatedState16 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState16 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState16 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (16:ss) xs
 generatedState16 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (16:ss) xs
 generatedState16 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState114 ps0 (x:vs) (16:ss) xs
@@ -199,7 +199,7 @@ generatedState16 _ _ _ xs = generatedError 16 xs
 
 
 generatedState17 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction38 ps0 vs
+  where x' = generatedReduction39 ps0 vs
 generatedState17 _ _ _ xs = generatedError 17 xs
 
 
@@ -225,6 +225,8 @@ generatedState21 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction30 ps0 vs
 generatedState21 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction30 ps0 vs
+generatedState21 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
+  where x' = generatedReduction30 ps0 vs
 generatedState21 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "paramtype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction30 ps0 vs
 generatedState21 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
@@ -242,6 +244,8 @@ generatedState22 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction18 ps0 vs
 generatedState22 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction18 ps0 vs
+generatedState22 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
+  where x' = generatedReduction18 ps0 vs
 generatedState22 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "paramtype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction18 ps0 vs
 generatedState22 ps0 vs ss (x@(AbsSynResult9 _ _):xs) = generatedState23 ps0 (x:vs) (22:ss) xs
@@ -256,6 +260,8 @@ generatedState23 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction17 ps0 vs
 generatedState23 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
   where x' = generatedReduction17 ps0 vs
+generatedState23 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
+  where x' = generatedReduction17 ps0 vs
 generatedState23 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "paramtype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
   where x' = generatedReduction17 ps0 vs
 generatedState23 _ _ _ xs = generatedError 23 xs
@@ -269,6 +275,8 @@ generatedState24 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "s
 generatedState24 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = generatedState24 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction19 ps0 vs
 generatedState24 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState24 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction19 ps0 vs
+generatedState24 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState24 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction19 ps0 vs
 generatedState24 ps0 vs ss (x@(AbsSynResult18 _ _):xs) = generatedState29 ps0 (x:vs) (24:ss) xs
 generatedState24 ps0 vs ss (x@(AbsSynResult10 _ _):xs) = generatedState31 ps0 (x:vs) (24:ss) xs
@@ -293,6 +301,8 @@ generatedState27 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction32 ps0 vs
 generatedState27 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction32 ps0 vs
+generatedState27 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
+  where x' = generatedReduction32 ps0 vs
 generatedState27 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "paramtype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction32 ps0 vs
 generatedState27 _ _ _ xs = generatedError 27 xs
@@ -305,6 +315,8 @@ generatedState28 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "s
 generatedState28 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction31 ps0 vs
 generatedState28 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
+  where x' = generatedReduction31 ps0 vs
+generatedState28 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction31 ps0 vs
 generatedState28 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "paramtype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
   where x' = generatedReduction31 ps0 vs
@@ -321,6 +333,8 @@ generatedState29 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction21 ps0 vs
 generatedState29 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction21 ps0 vs
+generatedState29 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
+  where x' = generatedReduction21 ps0 vs
 generatedState29 ps0 vs ss (x@(AbsSynResult11 _ _):xs) = generatedState30 ps0 (x:vs) (29:ss) xs
 generatedState29 _ _ _ xs = generatedError 29 xs
 
@@ -333,6 +347,8 @@ generatedState30 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction20 ps0 vs
 generatedState30 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
   where x' = generatedReduction20 ps0 vs
+generatedState30 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
+  where x' = generatedReduction20 ps0 vs
 generatedState30 _ _ _ xs = generatedError 30 xs
 
 
@@ -341,6 +357,8 @@ generatedState31 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generate
 generatedState31 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = generatedState31 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction34 ps0 vs
 generatedState31 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState31 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction34 ps0 vs
+generatedState31 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState31 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction34 ps0 vs
 generatedState31 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "stateextra"))):xs) = generatedState32 ps (x:vs) (31:ss) xs
 generatedState31 ps0 vs ss (x@(AbsSynResult19 _ _):xs) = generatedState37 ps0 (x:vs) (31:ss) xs
@@ -356,9 +374,9 @@ generatedState32 _ _ _ xs = generatedError 32 xs
 
 generatedState33 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction29 ps0 vs
-generatedState33 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction29 ps0 vs
 generatedState33 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
+  where x' = generatedReduction29 ps0 vs
+generatedState33 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction29 ps0 vs
 generatedState33 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction29 ps0 vs
@@ -367,9 +385,9 @@ generatedState33 _ _ _ xs = generatedError 33 xs
 
 generatedState34 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction28 ps0 vs
-generatedState34 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction28 ps0 vs
 generatedState34 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
+  where x' = generatedReduction28 ps0 vs
+generatedState34 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction28 ps0 vs
 generatedState34 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction28 ps0 vs
@@ -378,9 +396,9 @@ generatedState34 _ _ _ xs = generatedError 34 xs
 
 generatedState35 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction27 ps0 vs
-generatedState35 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction27 ps0 vs
 generatedState35 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
+  where x' = generatedReduction27 ps0 vs
+generatedState35 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction27 ps0 vs
 generatedState35 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
   where x' = generatedReduction27 ps0 vs
@@ -393,10 +411,16 @@ generatedState36 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "v
   where x' = generatedReduction33 ps0 vs
 generatedState36 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
   where x' = generatedReduction33 ps0 vs
+generatedState36 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
+  where x' = generatedReduction33 ps0 vs
 generatedState36 _ _ _ xs = generatedError 36 xs
 
 
+generatedState37 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState37 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction36 ps0 vs
 generatedState37 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState37 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction36 ps0 vs
+generatedState37 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState37 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction36 ps0 vs
 generatedState37 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = generatedState38 ps (x:vs) (37:ss) xs
 generatedState37 ps0 vs ss (x@(AbsSynResult20 _ _):xs) = generatedState40 ps0 (x:vs) (37:ss) xs
@@ -410,11 +434,17 @@ generatedState38 ps0 vs ss (x@(AbsSynResult16 _ _):xs) = generatedState39 ps0 (x
 generatedState38 _ _ _ xs = generatedError 38 xs
 
 
+generatedState39 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
+  where x' = generatedReduction35 ps0 vs
 generatedState39 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
+  where x' = generatedReduction35 ps0 vs
+generatedState39 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
   where x' = generatedReduction35 ps0 vs
 generatedState39 _ _ _ xs = generatedError 39 xs
 
 
+generatedState40 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState40 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction38 ps0 vs
 generatedState40 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState41 ps (x:vs) (40:ss) xs
 generatedState40 ps0 vs ss (x@(AbsSynResult21 _ _):xs) = generatedState43 ps0 (x:vs) (40:ss) xs
 generatedState40 _ _ _ xs = generatedError 40 xs
@@ -443,11 +473,11 @@ generatedState44 _ _ _ xs = generatedError 44 xs
 
 
 generatedState45 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction45 ps0 vs
+  where x' = generatedReduction46 ps0 vs
 generatedState45 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction45 ps0 vs
+  where x' = generatedReduction46 ps0 vs
 generatedState45 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction45 ps0 vs
+  where x' = generatedReduction46 ps0 vs
 generatedState45 _ _ _ xs = generatedError 45 xs
 
 
@@ -474,21 +504,21 @@ generatedState49 _ _ _ xs = generatedError 49 xs
 
 
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState50 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState50 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (50:ss) xs
 generatedState50 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState55 ps0 (x:vs) (50:ss) xs
 generatedState50 _ _ _ xs = generatedError 50 xs
@@ -501,70 +531,70 @@ generatedState51 _ _ _ xs = generatedError 51 xs
 
 
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction54 ps0 vs
+  where x' = generatedReduction55 ps0 vs
 generatedState52 _ _ _ xs = generatedError 52 xs
 
 
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction53 ps0 vs
+  where x' = generatedReduction54 ps0 vs
 generatedState53 _ _ _ xs = generatedError 53 xs
 
 
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction52 ps0 vs
+  where x' = generatedReduction53 ps0 vs
 generatedState54 _ _ _ xs = generatedError 54 xs
 
 
 generatedState55 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState55 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState55 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState55 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState55 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState55 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState55 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState55 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState55 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState56 ps (x:vs) (55:ss) xs
 generatedState55 ps0 vs ss (x@(AbsSynResult31 _ _):xs) = generatedState91 ps0 (x:vs) (55:ss) xs
 generatedState55 _ _ _ xs = generatedError 55 xs
@@ -588,40 +618,40 @@ generatedState58 _ _ _ xs = generatedError 58 xs
 
 
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState59 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState59 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (59:ss) xs
 generatedState59 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState60 ps0 (x:vs) (59:ss) xs
 generatedState59 _ _ _ xs = generatedError 59 xs
 
 
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction65 ps0 vs
+  where x' = generatedReduction66 ps0 vs
 generatedState60 _ _ _ xs = generatedError 60 xs
 
 
@@ -630,40 +660,40 @@ generatedState61 _ _ _ xs = generatedError 61 xs
 
 
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState62 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState62 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (62:ss) xs
 generatedState62 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState63 ps0 (x:vs) (62:ss) xs
 generatedState62 _ _ _ xs = generatedError 62 xs
 
 
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction64 ps0 vs
+  where x' = generatedReduction65 ps0 vs
 generatedState63 _ _ _ xs = generatedError 63 xs
 
 
@@ -672,40 +702,40 @@ generatedState64 _ _ _ xs = generatedError 64 xs
 
 
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState65 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState65 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (65:ss) xs
 generatedState65 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState66 ps0 (x:vs) (65:ss) xs
 generatedState65 _ _ _ xs = generatedError 65 xs
 
 
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction63 ps0 vs
+  where x' = generatedReduction64 ps0 vs
 generatedState66 _ _ _ xs = generatedError 66 xs
 
 
@@ -720,40 +750,40 @@ generatedState68 _ _ _ xs = generatedError 68 xs
 
 
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState69 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState69 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (69:ss) xs
 generatedState69 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState70 ps0 (x:vs) (69:ss) xs
 generatedState69 _ _ _ xs = generatedError 69 xs
 
 
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction62 ps0 vs
+  where x' = generatedReduction63 ps0 vs
 generatedState70 _ _ _ xs = generatedError 70 xs
 
 
@@ -762,40 +792,40 @@ generatedState71 _ _ _ xs = generatedError 71 xs
 
 
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState72 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState72 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (72:ss) xs
 generatedState72 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState73 ps0 (x:vs) (72:ss) xs
 generatedState72 _ _ _ xs = generatedError 72 xs
 
 
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction61 ps0 vs
+  where x' = generatedReduction62 ps0 vs
 generatedState73 _ _ _ xs = generatedError 73 xs
 
 
@@ -804,40 +834,40 @@ generatedState74 _ _ _ xs = generatedError 74 xs
 
 
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState75 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState75 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (75:ss) xs
 generatedState75 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState76 ps0 (x:vs) (75:ss) xs
 generatedState75 _ _ _ xs = generatedError 75 xs
 
 
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = (generatedStates !! (ss !! 3)) ps (drop 4 vs) (drop 4 ss) (x':x:xs)
-  where x' = generatedReduction60 ps0 vs
+  where x' = generatedReduction61 ps0 vs
 generatedState76 _ _ _ xs = generatedError 76 xs
 
 
@@ -845,40 +875,40 @@ generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _)
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState67 ps (x:vs) (77:ss) xs
 generatedState77 ps0 vs ss (x@(AbsSynResult33 _ _):xs) = generatedState77 ps0 (x:vs) (77:ss) xs
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction59 ps0 vs
+  where x' = generatedReduction60 ps0 vs
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction59 ps0 vs
+  where x' = generatedReduction60 ps0 vs
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction59 ps0 vs
+  where x' = generatedReduction60 ps0 vs
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction59 ps0 vs
+  where x' = generatedReduction60 ps0 vs
 generatedState77 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction59 ps0 vs
+  where x' = generatedReduction60 ps0 vs
 generatedState77 ps0 vs ss (x@(AbsSynResult32 _ _):xs) = generatedState78 ps0 (x:vs) (77:ss) xs
 generatedState77 _ _ _ xs = generatedError 77 xs
 
 
 generatedState78 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction58 ps0 vs
+  where x' = generatedReduction59 ps0 vs
 generatedState78 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction58 ps0 vs
+  where x' = generatedReduction59 ps0 vs
 generatedState78 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction58 ps0 vs
+  where x' = generatedReduction59 ps0 vs
 generatedState78 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction58 ps0 vs
+  where x' = generatedReduction59 ps0 vs
 generatedState78 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction58 ps0 vs
+  where x' = generatedReduction59 ps0 vs
 generatedState78 _ _ _ xs = generatedError 78 xs
 
 
 generatedState79 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState79 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction67 ps0 vs
+  where x' = generatedReduction68 ps0 vs
 generatedState79 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState79 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction67 ps0 vs
+  where x' = generatedReduction68 ps0 vs
 generatedState79 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState79 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction67 ps0 vs
+  where x' = generatedReduction68 ps0 vs
 generatedState79 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState79 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction67 ps0 vs
+  where x' = generatedReduction68 ps0 vs
 generatedState79 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState80 ps (x:vs) (79:ss) xs
 generatedState79 ps0 vs ss (x@(AbsSynResult34 _ _):xs) = generatedState90 ps0 (x:vs) (79:ss) xs
 generatedState79 _ _ _ xs = generatedError 79 xs
@@ -900,15 +930,15 @@ generatedState82 _ _ _ xs = generatedError 82 xs
 
 
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction72 ps0 vs
+  where x' = generatedReduction73 ps0 vs
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction72 ps0 vs
+  where x' = generatedReduction73 ps0 vs
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction72 ps0 vs
+  where x' = generatedReduction73 ps0 vs
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction72 ps0 vs
+  where x' = generatedReduction73 ps0 vs
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction72 ps0 vs
+  where x' = generatedReduction73 ps0 vs
 generatedState83 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator ","))):xs) = generatedState84 ps (x:vs) (83:ss) xs
 generatedState83 _ _ _ xs = generatedError 83 xs
 
@@ -919,85 +949,85 @@ generatedState84 _ _ _ xs = generatedError 84 xs
 
 
 generatedState85 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction71 ps0 vs
+  where x' = generatedReduction72 ps0 vs
 generatedState85 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction71 ps0 vs
+  where x' = generatedReduction72 ps0 vs
 generatedState85 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction71 ps0 vs
+  where x' = generatedReduction72 ps0 vs
 generatedState85 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction71 ps0 vs
+  where x' = generatedReduction72 ps0 vs
 generatedState85 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction71 ps0 vs
+  where x' = generatedReduction72 ps0 vs
 generatedState85 _ _ _ xs = generatedError 85 xs
 
 
 generatedState86 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction70 ps0 vs
+  where x' = generatedReduction71 ps0 vs
 generatedState86 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction70 ps0 vs
+  where x' = generatedReduction71 ps0 vs
 generatedState86 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction70 ps0 vs
+  where x' = generatedReduction71 ps0 vs
 generatedState86 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction70 ps0 vs
+  where x' = generatedReduction71 ps0 vs
 generatedState86 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction70 ps0 vs
+  where x' = generatedReduction71 ps0 vs
 generatedState86 _ _ _ xs = generatedError 86 xs
 
 
 generatedState87 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState81 ps (x:vs) (87:ss) xs
 generatedState87 ps0 vs ss (x@(AbsSynResult36 _ _):xs) = generatedState87 ps0 (x:vs) (87:ss) xs
 generatedState87 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction69 ps0 vs
+  where x' = generatedReduction70 ps0 vs
 generatedState87 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction69 ps0 vs
+  where x' = generatedReduction70 ps0 vs
 generatedState87 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction69 ps0 vs
+  where x' = generatedReduction70 ps0 vs
 generatedState87 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction69 ps0 vs
+  where x' = generatedReduction70 ps0 vs
 generatedState87 ps0 vs ss (x@(AbsSynResult35 _ _):xs) = generatedState88 ps0 (x:vs) (87:ss) xs
 generatedState87 _ _ _ xs = generatedError 87 xs
 
 
 generatedState88 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction68 ps0 vs
+  where x' = generatedReduction69 ps0 vs
 generatedState88 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction68 ps0 vs
+  where x' = generatedReduction69 ps0 vs
 generatedState88 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction68 ps0 vs
+  where x' = generatedReduction69 ps0 vs
 generatedState88 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction68 ps0 vs
+  where x' = generatedReduction69 ps0 vs
 generatedState88 _ _ _ xs = generatedError 88 xs
 
 
 generatedState89 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction66 ps0 vs
+  where x' = generatedReduction67 ps0 vs
 generatedState89 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction66 ps0 vs
+  where x' = generatedReduction67 ps0 vs
 generatedState89 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction66 ps0 vs
+  where x' = generatedReduction67 ps0 vs
 generatedState89 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction66 ps0 vs
+  where x' = generatedReduction67 ps0 vs
 generatedState89 _ _ _ xs = generatedError 89 xs
 
 
 generatedState90 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction56 ps0 vs
+  where x' = generatedReduction57 ps0 vs
 generatedState90 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction56 ps0 vs
+  where x' = generatedReduction57 ps0 vs
 generatedState90 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction56 ps0 vs
+  where x' = generatedReduction57 ps0 vs
 generatedState90 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = (generatedStates !! (ss !! 2)) ps (drop 3 vs) (drop 3 ss) (x':x:xs)
-  where x' = generatedReduction56 ps0 vs
+  where x' = generatedReduction57 ps0 vs
 generatedState90 _ _ _ xs = generatedError 90 xs
 
 
 generatedState91 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState92 ps (x:vs) (91:ss) xs
 generatedState91 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState91 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState91 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState91 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState91 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState91 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState91 ps0 vs ss (x@(AbsSynResult38 _ _):xs) = generatedState94 ps0 (x:vs) (91:ss) xs
 generatedState91 ps0 vs ss (x@(AbsSynResult28 _ _):xs) = generatedState95 ps0 (x:vs) (91:ss) xs
 generatedState91 ps0 vs ss (x@(AbsSynResult29 _ _):xs) = generatedState96 ps0 (x:vs) (91:ss) xs
@@ -1009,38 +1039,38 @@ generatedState92 _ _ _ xs = generatedError 92 xs
 
 
 generatedState93 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction73 ps0 vs
+  where x' = generatedReduction74 ps0 vs
 generatedState93 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction73 ps0 vs
+  where x' = generatedReduction74 ps0 vs
 generatedState93 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction73 ps0 vs
+  where x' = generatedReduction74 ps0 vs
 generatedState93 _ _ _ xs = generatedError 93 xs
 
 
 generatedState94 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction51 ps0 vs
+  where x' = generatedReduction52 ps0 vs
 generatedState94 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction51 ps0 vs
+  where x' = generatedReduction52 ps0 vs
 generatedState94 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction51 ps0 vs
+  where x' = generatedReduction52 ps0 vs
 generatedState94 _ _ _ xs = generatedError 94 xs
 
 
 generatedState95 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction49 ps0 vs
+  where x' = generatedReduction50 ps0 vs
 generatedState95 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction49 ps0 vs
+  where x' = generatedReduction50 ps0 vs
 generatedState95 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction49 ps0 vs
+  where x' = generatedReduction50 ps0 vs
 generatedState95 _ _ _ xs = generatedError 95 xs
 
 
 generatedState96 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction48 ps0 vs
+  where x' = generatedReduction49 ps0 vs
 generatedState96 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction48 ps0 vs
+  where x' = generatedReduction49 ps0 vs
 generatedState96 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction48 ps0 vs
+  where x' = generatedReduction49 ps0 vs
 generatedState96 _ _ _ xs = generatedError 96 xs
 
 
@@ -1049,34 +1079,34 @@ generatedState97 _ _ _ xs = generatedError 97 xs
 
 
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "restricting"))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenIdentifier _))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "CodeBlock" _))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState98 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction55 ps0 vs
+  where x' = generatedReduction56 ps0 vs
 generatedState98 ps0 vs ss (x@(AbsSynToken (Token ps (TokenOperator "@"))):xs) = generatedState51 ps (x:vs) (98:ss) xs
 generatedState98 ps0 vs ss (x@(AbsSynResult30 _ _):xs) = generatedState99 ps0 (x:vs) (98:ss) xs
 generatedState98 _ _ _ xs = generatedError 98 xs
 
 
 generatedState99 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState99 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState99 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState99 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState99 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState99 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState99 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState99 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction57 ps0 vs
+  where x' = generatedReduction58 ps0 vs
 generatedState99 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "evaluating"))):xs) = generatedState56 ps (x:vs) (99:ss) xs
 generatedState99 ps0 vs ss (x@(AbsSynResult31 _ _):xs) = generatedState100 ps0 (x:vs) (99:ss) xs
 generatedState99 _ _ _ xs = generatedError 99 xs
@@ -1084,11 +1114,11 @@ generatedState99 _ _ _ xs = generatedError 99 xs
 
 generatedState100 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "where"))):xs) = generatedState92 ps (x:vs) (100:ss) xs
 generatedState100 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState100 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState100 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = generatedState100 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState100 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState100 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction50 ps0 vs
+  where x' = generatedReduction51 ps0 vs
 generatedState100 ps0 vs ss (x@(AbsSynResult38 _ _):xs) = generatedState94 ps0 (x:vs) (100:ss) xs
 generatedState100 ps0 vs ss (x@(AbsSynResult28 _ _):xs) = generatedState101 ps0 (x:vs) (100:ss) xs
 generatedState100 ps0 vs ss (x@(AbsSynResult29 _ _):xs) = generatedState102 ps0 (x:vs) (100:ss) xs
@@ -1096,38 +1126,38 @@ generatedState100 _ _ _ xs = generatedError 100 xs
 
 
 generatedState101 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction47 ps0 vs
+  where x' = generatedReduction48 ps0 vs
 generatedState101 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction47 ps0 vs
+  where x' = generatedReduction48 ps0 vs
 generatedState101 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction47 ps0 vs
+  where x' = generatedReduction48 ps0 vs
 generatedState101 _ _ _ xs = generatedError 101 xs
 
 
 generatedState102 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction46 ps0 vs
+  where x' = generatedReduction47 ps0 vs
 generatedState102 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction46 ps0 vs
+  where x' = generatedReduction47 ps0 vs
 generatedState102 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 6)) ps (drop 7 vs) (drop 7 ss) (x':x:xs)
-  where x' = generatedReduction46 ps0 vs
+  where x' = generatedReduction47 ps0 vs
 generatedState102 _ _ _ xs = generatedError 102 xs
 
 
 generatedState103 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction44 ps0 vs
+  where x' = generatedReduction45 ps0 vs
 generatedState103 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction44 ps0 vs
+  where x' = generatedReduction45 ps0 vs
 generatedState103 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction44 ps0 vs
+  where x' = generatedReduction45 ps0 vs
 generatedState103 _ _ _ xs = generatedError 103 xs
 
 
 generatedState104 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction43 ps0 vs
+  where x' = generatedReduction44 ps0 vs
 generatedState104 ps0 vs ss (x@(AbsSynToken (Token ps (TokenKeyword "case"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction43 ps0 vs
+  where x' = generatedReduction44 ps0 vs
 generatedState104 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction43 ps0 vs
+  where x' = generatedReduction44 ps0 vs
 generatedState104 _ _ _ xs = generatedError 104 xs
 
 
@@ -1137,18 +1167,18 @@ generatedState105 ps0 vs ss (x@(AbsSynResult26 _ _):xs) = generatedState103 ps0 
 generatedState105 ps0 vs ss (x@(AbsSynResult27 _ _):xs) = generatedState104 ps0 (x:vs) (105:ss) xs
 generatedState105 ps0 vs ss (x@(AbsSynResult25 _ _):xs) = generatedState105 ps0 (x:vs) (105:ss) xs
 generatedState105 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 0)) ps (drop 1 vs) (drop 1 ss) (x':x:xs)
-  where x' = generatedReduction42 ps0 vs
+  where x' = generatedReduction43 ps0 vs
 generatedState105 ps0 vs ss (x@(AbsSynResult24 _ _):xs) = generatedState106 ps0 (x:vs) (105:ss) xs
 generatedState105 _ _ _ xs = generatedError 105 xs
 
 
 generatedState106 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction41 ps0 vs
+  where x' = generatedReduction42 ps0 vs
 generatedState106 _ _ _ xs = generatedError 106 xs
 
 
 generatedState107 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = (generatedStates !! (ss !! 1)) ps (drop 2 vs) (drop 2 ss) (x':x:xs)
-  where x' = generatedReduction40 ps0 vs
+  where x' = generatedReduction41 ps0 vs
 generatedState107 _ _ _ xs = generatedError 107 xs
 
 
@@ -1163,18 +1193,26 @@ generatedState109 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "
   where x' = generatedReduction34 ps0 vs
 generatedState109 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState109 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction34 ps0 vs
+generatedState109 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState109 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction34 ps0 vs
 generatedState109 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "stateextra"))):xs) = generatedState32 ps (x:vs) (109:ss) xs
 generatedState109 ps0 vs ss (x@(AbsSynResult19 _ _):xs) = generatedState110 ps0 (x:vs) (109:ss) xs
 generatedState109 _ _ _ xs = generatedError 109 xs
 
 
+generatedState110 ps0 vs ss (x@(AbsSynToken (Token ps (TokenEOF))):xs) = generatedState110 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction36 ps0 vs
 generatedState110 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState110 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction36 ps0 vs
+generatedState110 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState110 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
   where x' = generatedReduction36 ps0 vs
 generatedState110 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "varextra"))):xs) = generatedState38 ps (x:vs) (110:ss) xs
 generatedState110 ps0 vs ss (x@(AbsSynResult20 _ _):xs) = generatedState111 ps0 (x:vs) (110:ss) xs
 generatedState110 _ _ _ xs = generatedError 110 xs
 
 
+generatedState111 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "asttype"))):xs) = generatedState111 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
+  where x' = generatedReduction38 ps0 vs
 generatedState111 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "standardenv"))):xs) = generatedState41 ps (x:vs) (111:ss) xs
 generatedState111 ps0 vs ss (x@(AbsSynResult21 _ _):xs) = generatedState112 ps0 (x:vs) (111:ss) xs
 generatedState111 _ _ _ xs = generatedError 111 xs
@@ -1197,7 +1235,7 @@ generatedState114 _ _ _ xs = generatedError 114 xs
 
 
 generatedState115 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState115 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState115 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (115:ss) xs
 generatedState115 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (115:ss) xs
 generatedState115 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState116 ps0 (x:vs) (115:ss) xs
@@ -1221,7 +1259,7 @@ generatedState117 _ _ _ xs = generatedError 117 xs
 
 
 generatedState118 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState118 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState118 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (118:ss) xs
 generatedState118 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (118:ss) xs
 generatedState118 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState119 ps0 (x:vs) (118:ss) xs
@@ -1234,7 +1272,7 @@ generatedState119 _ _ _ xs = generatedError 119 xs
 
 
 generatedState120 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState120 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState120 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (120:ss) xs
 generatedState120 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (120:ss) xs
 generatedState120 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState121 ps0 (x:vs) (120:ss) xs
@@ -1273,7 +1311,7 @@ generatedState123 _ _ _ xs = generatedError 123 xs
 
 
 generatedState124 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState124 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState124 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (124:ss) xs
 generatedState124 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (124:ss) xs
 generatedState124 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState125 ps0 (x:vs) (124:ss) xs
@@ -1286,7 +1324,7 @@ generatedState125 _ _ _ xs = generatedError 125 xs
 
 
 generatedState126 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState126 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState126 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (126:ss) xs
 generatedState126 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (126:ss) xs
 generatedState126 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState127 ps0 (x:vs) (126:ss) xs
@@ -1310,7 +1348,7 @@ generatedState128 _ _ _ xs = generatedError 128 xs
 
 
 generatedState129 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState129 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState129 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (129:ss) xs
 generatedState129 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (129:ss) xs
 generatedState129 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState130 ps0 (x:vs) (129:ss) xs
@@ -1323,7 +1361,7 @@ generatedState130 _ _ _ xs = generatedError 130 xs
 
 
 generatedState131 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "basetype"))):xs) = generatedState131 ps (drop 0 vs) (drop 0 ss) (x':x:xs)
-  where x' = generatedReduction39 ps0 vs
+  where x' = generatedReduction40 ps0 vs
 generatedState131 ps0 vs ss (x@(AbsSynToken (Token ps (TokenCustom "Directive" "hasincludes"))):xs) = generatedState17 ps (x:vs) (131:ss) xs
 generatedState131 ps0 vs ss (x@(AbsSynResult22 _ _):xs) = generatedState18 ps0 (x:vs) (131:ss) xs
 generatedState131 ps0 vs ss (x@(AbsSynResult8 _ _):xs) = generatedState132 ps0 (x:vs) (131:ss) xs
@@ -1413,75 +1451,77 @@ generatedReduction36 ps0 (_) = AbsSynResult20 ("()") ps0
 
 generatedReduction37 ps0 ((AbsSynResult16 v2 ps2):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult21 (v2) ps1
 
-generatedReduction38 ps0 ((AbsSynToken (Token ps1 v1)):_) = AbsSynResult22 (True) ps1
+generatedReduction38 ps0 (_) = AbsSynResult21 ("return ()") ps0
 
-generatedReduction39 ps0 (_) = AbsSynResult22 (False) ps0
+generatedReduction39 ps0 ((AbsSynToken (Token ps1 v1)):_) = AbsSynResult22 (True) ps1
 
-generatedReduction40 ps0 ((AbsSynResult24 v2 ps2):(AbsSynResult26 v1 ps1):_) = AbsSynResult23 ((Right v1):v2) ps1
+generatedReduction40 ps0 (_) = AbsSynResult22 (False) ps0
 
-generatedReduction41 ps0 ((AbsSynResult24 v2 ps2):(AbsSynResult25 v1 ps1):_) = AbsSynResult24 (v1:v2) ps1
+generatedReduction41 ps0 ((AbsSynResult24 v2 ps2):(AbsSynResult26 v1 ps1):_) = AbsSynResult23 ((Right v1):v2) ps1
 
-generatedReduction42 ps0 ((AbsSynResult25 v1 ps1):_) = AbsSynResult24 ([v1]) ps1
+generatedReduction42 ps0 ((AbsSynResult24 v2 ps2):(AbsSynResult25 v1 ps1):_) = AbsSynResult24 (v1:v2) ps1
 
-generatedReduction43 ps0 ((AbsSynResult27 v1 ps1):_) = AbsSynResult25 (Left v1) ps1
+generatedReduction43 ps0 ((AbsSynResult25 v1 ps1):_) = AbsSynResult24 ([v1]) ps1
 
-generatedReduction44 ps0 ((AbsSynResult26 v1 ps1):_) = AbsSynResult25 (Right v1) ps1
+generatedReduction44 ps0 ((AbsSynResult27 v1 ps1):_) = AbsSynResult25 (Left v1) ps1
 
-generatedReduction45 ps0 ((AbsSynToken (Token ps2 (TokenUpperIdentifier v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult26 (v2) ps1
+generatedReduction45 ps0 ((AbsSynResult26 v1 ps1):_) = AbsSynResult25 (Right v1) ps1
 
-generatedReduction46 ps0 ((AbsSynResult29 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 False v5 "" v7) v6) ps1
+generatedReduction46 ps0 ((AbsSynToken (Token ps2 (TokenUpperIdentifier v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult26 (v2) ps1
 
-generatedReduction47 ps0 ((AbsSynResult28 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 False v5 "" v7) v6) ps1
+generatedReduction47 ps0 ((AbsSynResult29 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 False v5 "" v7) v6) ps1
 
-generatedReduction48 ps0 ((AbsSynResult29 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 True v5 "" v7) v6) ps1
+generatedReduction48 ps0 ((AbsSynResult28 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 False v5 "" v7) v6) ps1
 
-generatedReduction49 ps0 ((AbsSynResult28 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 True v5 "" v7) v6) ps1
+generatedReduction49 ps0 ((AbsSynResult29 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 True v5 "" v7) v6) ps1
 
-generatedReduction50 ps0 (_) = AbsSynResult28 (empty) ps0
+generatedReduction50 ps0 ((AbsSynResult28 v7 ps7):(AbsSynResult31 v6 ps6):(AbsSynResult30 v5 ps5):(AbsSynToken (Token ps4 (TokenCustom "CodeBlock" v4))):(AbsSynToken (Token ps3 v3)):(AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult27 (uncurry (SemanticsRule v2 v4 True v5 "" v7) v6) ps1
 
-generatedReduction51 ps0 ((AbsSynResult38 v1 ps1):_) = AbsSynResult29 (Just v1) ps1
+generatedReduction51 ps0 (_) = AbsSynResult28 (empty) ps0
 
-generatedReduction52 ps0 ((AbsSynToken (Token ps2 (TokenStringLit v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsStaticBaseType v2) ps1
+generatedReduction52 ps0 ((AbsSynResult38 v1 ps1):_) = AbsSynResult29 (Just v1) ps1
 
-generatedReduction53 ps0 ((AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsStaticType v2) ps1
+generatedReduction53 ps0 ((AbsSynToken (Token ps2 (TokenStringLit v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsStaticBaseType v2) ps1
 
-generatedReduction54 ps0 ((AbsSynToken (Token ps2 (TokenIdentifier v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsVarType v2) ps1
+generatedReduction54 ps0 ((AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsStaticType v2) ps1
 
-generatedReduction55 ps0 (_) = AbsSynResult30 (SemanticsCommandType) ps0
+generatedReduction55 ps0 ((AbsSynToken (Token ps2 (TokenIdentifier v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult30 (SemanticsVarType v2) ps1
 
-generatedReduction56 ps0 ((AbsSynResult34 v3 ps3):(AbsSynResult32 v2 ps2):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult31 ((v2, v3)) ps1
+generatedReduction56 ps0 (_) = AbsSynResult30 (SemanticsCommandType) ps0
 
-generatedReduction57 ps0 (_) = AbsSynResult31 (([], [])) ps0
+generatedReduction57 ps0 ((AbsSynResult34 v3 ps3):(AbsSynResult32 v2 ps2):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult31 ((v2, v3)) ps1
 
-generatedReduction58 ps0 ((AbsSynResult32 v2 ps2):(AbsSynResult33 v1 ps1):_) = AbsSynResult32 (v1:v2) ps1
+generatedReduction58 ps0 (_) = AbsSynResult31 (([], [])) ps0
 
-generatedReduction59 ps0 ((AbsSynResult33 v1 ps1):_) = AbsSynResult32 ([v1]) ps1
+generatedReduction59 ps0 ((AbsSynResult32 v2 ps2):(AbsSynResult33 v1 ps1):_) = AbsSynResult32 (v1:v2) ps1
 
-generatedReduction60 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False SemanticsDepSingle) ps1
+generatedReduction60 ps0 ((AbsSynResult33 v1 ps1):_) = AbsSynResult32 ([v1]) ps1
 
-generatedReduction61 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold False)) ps1
+generatedReduction61 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False SemanticsDepSingle) ps1
 
-generatedReduction62 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold True)) ps1
+generatedReduction62 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold False)) ps1
 
-generatedReduction63 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  SemanticsDepSingle) ps1
+generatedReduction63 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenIdentifier v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) False (SemanticsDepFold True)) ps1
 
-generatedReduction64 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold False)) ps1
+generatedReduction64 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  SemanticsDepSingle) ps1
 
-generatedReduction65 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold True)) ps1
+generatedReduction65 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold False)) ps1
 
-generatedReduction66 ps0 ((AbsSynResult35 v2 ps2):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult34 (v2) ps1
+generatedReduction66 ps0 ((AbsSynResult30 v4 ps4):(AbsSynToken (Token ps3 (TokenCustom "CodeBlock" v3))):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenCustom "CodeBlock" v1))):_) = AbsSynResult33 (SemanticsRuleDependency v1 v3 (RawSemanticsDepType v4) True  (SemanticsDepFold True)) ps1
 
-generatedReduction67 ps0 (_) = AbsSynResult34 ([]) ps0
+generatedReduction67 ps0 ((AbsSynResult35 v2 ps2):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult34 (v2) ps1
 
-generatedReduction68 ps0 ((AbsSynResult35 v2 ps2):(AbsSynResult36 v1 ps1):_) = AbsSynResult35 (v1:v2) ps1
+generatedReduction68 ps0 (_) = AbsSynResult34 ([]) ps0
 
-generatedReduction69 ps0 ((AbsSynResult36 v1 ps1):_) = AbsSynResult35 ([v1]) ps1
+generatedReduction69 ps0 ((AbsSynResult35 v2 ps2):(AbsSynResult36 v1 ps1):_) = AbsSynResult35 (v1:v2) ps1
 
-generatedReduction70 ps0 ((AbsSynResult37 v3 ps3):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult36 (SemanticsTypeRestriction v1 v3) ps1
+generatedReduction70 ps0 ((AbsSynResult36 v1 ps1):_) = AbsSynResult35 ([v1]) ps1
 
-generatedReduction71 ps0 ((AbsSynResult37 v3 ps3):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult37 (v1:v3) ps1
+generatedReduction71 ps0 ((AbsSynResult37 v3 ps3):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult36 (SemanticsTypeRestriction v1 v3) ps1
 
-generatedReduction72 ps0 ((AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult37 ([v1]) ps1
+generatedReduction72 ps0 ((AbsSynResult37 v3 ps3):(AbsSynToken (Token ps2 v2)):(AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult37 (v1:v3) ps1
 
-generatedReduction73 ps0 ((AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult38 (v2) ps1
+generatedReduction73 ps0 ((AbsSynToken (Token ps1 (TokenIdentifier v1))):_) = AbsSynResult37 ([v1]) ps1
+
+generatedReduction74 ps0 ((AbsSynToken (Token ps2 (TokenCustom "CodeBlock" v2))):(AbsSynToken (Token ps1 v1)):_) = AbsSynResult38 (v2) ps1
 

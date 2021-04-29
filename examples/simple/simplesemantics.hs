@@ -60,14 +60,13 @@ makeLenses ''VolatileState
 makeLenses ''Var
 makeLenses ''VarType
 rDefaultState :: Result SemanticsState
-rDefaultState = fmap snd $ runStateT ( return ()  >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState "")
+rDefaultState = fmap snd $ runStateT (return () >> modEnv increaseScope) (SemanticsState defaultPersistentState mempty $ parseState "")
 
 
-preCode :: String
-preCode = "#include <stdio.h>"
+
 
 _outPreCode :: String
-_outPreCode = preCode ++ "\n\n"
+_outPreCode =  "#include <stdio.h>"  ++ "\n\n"
 
 
 class SemanticsEvaluable a where
