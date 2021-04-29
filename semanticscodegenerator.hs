@@ -163,8 +163,8 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "getVar name env = env ^? vars . at name . _Just . _head\n" ++
             "getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())\n" ++
             "getStaticFunc name args env = env ^? staticFuncs . at (name, args) . _Just . _head\n" ++
-            "getVarFunc :: String -> [VarType] -> VolatileState -> Maybe (Var VarExtra, [VarType], VarType)\n" ++
-            "getVarFunc name args env = do\n" ++
+            "getVarFunc :: String -> VolatileState -> Maybe (Var VarExtra, [VarType], VarType)\n" ++
+            "getVarFunc name env = do\n" ++
             "    var <- getVar name env\n" ++
             "    case _varType var of\n" ++
             "        FuncType is o -> Just (var, is, o)\n" ++
@@ -227,11 +227,11 @@ cPresetsCode = "cBinOp :: String -> String -> String -> String\n" ++
                "cCreateVar v (Just s) = toCType (_varType v) ++ \" \" ++ cVar v ++ \" = \" ++ s ++ \";\"\n" ++
                "cWhile :: String -> String -> String\n" ++
                "cWhile cond cmd = \"while(\" ++ cond ++ \")\" ++ cBlock cmd\n" ++
-               "cRawFor :: Var a -> String -> String -> String -> String -> String\n" ++
-               "cRawFor v init cond step cmd = \"for(\" ++ cCreateVar v (Just init) ++ \"; \" ++ cond ++ \"; \" ++ step ++ \")\" ++ cBlock cmd\n" ++
+               "cFor :: Var a -> String -> String -> String -> String -> String\n" ++
+               "cFor v init cond step cmd = \"for(\" ++ cCreateVar v (Just init) ++ \"; \" ++ cond ++ \"; \" ++ step ++ \")\" ++ cBlock cmd\n" ++
                "cSimpleFor :: Var a -> String -> String -> String -> String -> String\n" ++
                "cSimpleFor v init limit step cmd = cBlock $ \"int limit = \" ++ limit ++ \";\\n\" ++\n" ++
-               "                                            cRawFor v init \"limit\" (cVar v ++ \" += \" ++ step) cmd\n"
+               "                                            cFor v init \"limit\" (cVar v ++ \" += \" ++ step) cmd\n"
 
 astFuncName :: String -> String
 astFuncName t = "generateCode" ++ t
