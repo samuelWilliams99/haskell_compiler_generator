@@ -25,7 +25,7 @@ instance Show SemanticsType where
 data SemanticsRule =
     SemanticsRule{ _semanticsRulePattern :: String
                  , _semanticsRuleOutput :: String
-                 , _semanticsRuleChangesEnv :: Bool
+                 , _semanticsRuleOutputEnv :: String
                  , _semanticsRuleType :: SemanticsType
                  , _semanticsRuleAstType :: String
                  , _semanticsRuleWhere :: Maybe String

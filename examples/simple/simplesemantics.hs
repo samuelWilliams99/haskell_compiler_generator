@@ -232,9 +232,8 @@ generateCodeSimpleCommand (SimpleAssign name exp ps) = do
     require ("Expected " ++ show (BaseType "integer") ++ ", got " ++ show depType0) $ depType0 == BaseType "integer"
     assign psState ps
     (var, env') <- addVar name () (BaseType "integer") env
-    let output = (cCreateVar var (Just expS), env')
-    assign volatileState $ snd output
-    return (fst output, CommandType)
+    assign volatileState env'
+    return (cCreateVar var (Just expS), CommandType)
 
 generateCodeSimpleCommand (SimplePrint exp ps) = do
     env <- use volatileState

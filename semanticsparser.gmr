@@ -14,7 +14,7 @@ handleStatements stmts = aux stmts ""
     aux ((Right t):stmts) _ = second (union [t]) $ aux stmts t
 }
 
-%operators "->" "=>" "<-" "@" "," "*->" "^->" "~"
+%operators "->" "<-" "@" "," "*->" "^->" "~"
 %keywords "evaluating" "where" "restricting" "to" "case"
 %linecomments "#"
 %blockcomments "#[" "]#"
@@ -50,7 +50,7 @@ PreCode :: preCode codeBlock                                     { v2 }
 
 OutPreCode :: outputPreCode LowerCodeBlock                       { v2 }
 
-LowerCodeBlock :: codeBlock { v1 } | identifierPrime { v1 }
+LowerCodeBlock :: codeBlock { v1 } | identifierPrime { v1 } | identifier { v1 }
 
 CodeBlock :: LowerCodeBlock { v1 } | upperIdentifier { v1 }
 
@@ -78,9 +78,7 @@ Stmt :: Rule                                                     { Left v1 }
 
 AstType :: astType upperIdentifier                               { v2 }
 
-RuleArrow :: "->" { False } | "=>" { True }
-
-Rule :: case codeBlock RuleArrow codeBlock Type Evals Where?     { uncurry (SemanticsRule v2 v4 v3 v5 "" v7) v6 }
+Rule :: case codeBlock "->" codeBlock InputEnv Type Evals Where? { uncurry (SemanticsRule v2 v4 v5 v6 "" v8) v7 }
 
 Type :: "@" stringLit                                            { SemanticsStaticBaseType v2 }
       | "@" codeBlock                                            { SemanticsStaticType v2 }

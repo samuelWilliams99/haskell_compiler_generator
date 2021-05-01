@@ -244,9 +244,7 @@ generateInstanceCode (t:ts) = astFuncName t ++ " :: " ++ t ++ " -> StateResult (
                               generateInstanceCode ts
 
 generateTypeCode :: HashMap String String -> HashMap String String -> String
-generateTypeCode baseTypes paramTypes = "isBaseType :: String -> Bool\n" ++
-                                        "isBaseType t = elem t " ++ show (keys baseTypes) ++ "\n" ++
-                                        "baseTypesC :: HashMap String String\n" ++
+generateTypeCode baseTypes paramTypes = "baseTypesC :: HashMap String String\n" ++
                                         "baseTypesC = " ++ show baseTypes ++ "\n" ++
                                         "paramTypesC :: HashMap String ([String] -> String)\n" ++
                                         "paramTypesC = fromList " ++ show (fmap (\(n, f) -> "(" ++ show n ++ ", " ++ f ++ ")") $ toList paramTypes)
@@ -303,11 +301,10 @@ generateRestrictionsCode ((SemanticsTypeRestriction name ts):rs) =
   where
     rest = generateRestrictionsCode rs
 
-generateRuleReturnCode :: Bool -> String -> SemanticsType -> String
-generateRuleReturnCode True out t = "    let output = " ++ trim out ++ "\n" ++
-                                    "    assign volatileState $ snd output\n" ++
-                                    "    return (fst output, " ++ trim (show t) ++ ")"
-generateRuleReturnCode False out t = "    return (" ++ trim out ++ ", " ++ trim (show t) ++ ")"
+generateRuleReturnCode :: String -> String -> SemanticsType -> String
+generateRuleReturnCode out "env" t =  "    return (" ++ trim out ++ ", " ++ trim (show t) ++ ")"
+generateRuleReturnCode out outEnv t = "    assign volatileState (" ++ trim outEnv ++ ")\n" ++
+                                      "    return (" ++ trim out ++ ", " ++ trim (show t) ++ ")"
 
 generateRulesCode :: [SemanticsRule] -> String
 generateRulesCode [] = ""
@@ -330,5 +327,5 @@ generateRulesCode (r:rs) =
     depsCode = generateDepsCode 0 $ _semanticsRuleDeps r
     restrictCode = generateRestrictionsCode $ _semanticsRuleTypeRestrictions r
     whereCode = fromMaybe "" $ fmap ((++"\n") . reindent 4) $ _semanticsRuleWhere r
-    ret = generateRuleReturnCode (_semanticsRuleChangesEnv r) (_semanticsRuleOutput r) (_semanticsRuleType r)
+    ret = generateRuleReturnCode (_semanticsRuleOutput r) (_semanticsRuleOutputEnv r) (_semanticsRuleType r)
     rest = generateRulesCode rs

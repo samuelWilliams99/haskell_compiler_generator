@@ -74,7 +74,7 @@ case { ASTExprUnOp "-" x ps } -> { cUnOp xs "-" } @ "int"
 
 %asttype ASTCommand
 
-case { ASTAssign name x ps } => { (cAssignVar var xs, env') }
+case { ASTAssign name x ps } -> { cAssignVar var xs } ~ env'
     evaluating
         x -> xs @ "int"
     where
@@ -103,20 +103,20 @@ case { ASTWhile cond cmd ps } -> { cWhile condS cmdS }
         cond -> condS @ "boolean"
         cmd -> cmdS
 
-case { ASTLet decls cmd ps } => { (cBlock $ cSeq $ declsS ++ [cmdS], decreaseScope env'') }
+case { ASTLet decls cmd ps } -> { cBlock $ cSeq $ declsS ++ [cmdS] } ~ { decreaseScope env'' }
     evaluating
-        { (decls, env) } ^=> { (declsS, env') }
-        { (cmd, increaseScope env') } => { (cmdS, env'') }
+        decls ^-> declsS ~ env'
+        cmd ~ { increaseScope env' } -> cmdS ~ env''
 
-case { ASTSeq cmds ps } => { (cSeq cmdsS, env') }
+case { ASTSeq cmds ps } -> { cSeq cmdsS } ~ env'
     evaluating
-        { (cmds, env) } ^=> { (cmdsS, env') }
+        cmds ^-> cmdsS ~ env'
 
 case { ASTPass ps } -> { cPass }
 
 %asttype ASTDecl
 
-case { ASTDeclConst name val ps } => { (cCreateVar var (Just valS), env') }
+case { ASTDeclConst name val ps } -> { cCreateVar var (Just valS) } ~ env'
     evaluating
         val -> valS @ "int"
     where
@@ -124,13 +124,13 @@ case { ASTDeclConst name val ps } => { (cCreateVar var (Just valS), env') }
             (var, env') <- addVar name (True, True) (BaseType "int") env
         }
 
-case { ASTDeclVar name Nothing ps } => { (cCreateVar var Nothing, env') }
+case { ASTDeclVar name Nothing ps } -> { cCreateVar var Nothing } ~ env'
     where
         {
             (var, env') <- addVar name (False, False) (BaseType "int") env
         }
 
-case { ASTDeclVar name (Just val) ps } => { (cCreateVar var (Just valS), env') }
+case { ASTDeclVar name (Just val) ps } -> { cCreateVar var (Just valS) } ~ env'
     evaluating
         val -> valS @ "int"
     where

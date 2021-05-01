@@ -1,4 +1,4 @@
-module SemanticsValidator where
+module SemanticsValidator (validateSemantics) where
 
 import ParserRequirements
 import Semantics

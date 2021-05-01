@@ -10,7 +10,7 @@ case { SimpleCommands cmds ps } -> { cSeq cmdsS }
 
 %asttype SimpleCommand
 
-case { SimpleAssign name exp ps } => { (cCreateVar var (Just expS), env') }
+case { SimpleAssign name exp ps } -> { cCreateVar var (Just expS) } ~ env'
   evaluating
     exp -> expS @ "integer"
   where
