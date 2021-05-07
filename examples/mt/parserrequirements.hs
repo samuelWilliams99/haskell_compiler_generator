@@ -1,10 +1,26 @@
+{-|
+Module      : ParserRequirements
+Description : Library containing all the requirements for a parser
+Copyright   : (c) Samuel Williams, 2021
+                  Graham Hutton, 2016
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+This module is copied to any generated parser and contains 5 sections of code:
+  [@ParseState@] Data type and helper functions for keeping track of source position
+  [@Result@] Maybe-like data type including error string for failure
+  [@Parser a@] Modified @Parser@ library from Graham Huttons Programming in Haskell
+  [@Scanner@] Configurable scanner/lexer taking a String and returning a list of @Token@s
+  [@languageDefsParser@] A set of @Parser@s specifically for the gmr file, and any other similar meta-languages
+-}
 module ParserRequirements where
 import Data.Char
 import Data.List
 import Data.Foldable
 import Control.Applicative
 import Control.Monad.State
--- ParseState
+-- | ParseState
 data ParseState = ParseState { line   :: Int
                              , column :: Int
                              , pos    :: Int

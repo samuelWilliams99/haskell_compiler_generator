@@ -52,6 +52,7 @@ generateImportsCode parserName mImports =
     "import Data.Hashable\n" ++
     "import Data.Maybe\n" ++
     "import Data.Monoid\n" ++
+    "import Data.Foldable\n" ++
     unindent (fromMaybe "" mImports)
 
 generateStateTypeCode :: String -> String -> String -> String
@@ -123,14 +124,14 @@ utilsCode = "incrementCounter :: StateResult Int\n" ++
             "forceMaybe :: String -> Maybe a -> StateResult a\n" ++
             "forceMaybe errMsg Nothing = err errMsg\n" ++
             "forceMaybe _ (Just a) = return a\n\n" ++
-            "evalFold :: (SemanticsEvaluable a) => Bool -> [a] -> StateResult ([String], [VarType])\n" ++
-            "evalFold _ [] = return ([], [])\n" ++
-            "evalFold forwardEnv (e:es) = do\n" ++
-            "    env <- gets _volatileState\n" ++
-            "    ((code, env'), t) <- runEval (eval e) env\n" ++
-            "    if forwardEnv then assign volatileState env' else return ()\n" ++
-            "    (codes, ts) <- evalFold forwardEnv es\n" ++
-            "    return (code:codes, t:ts)\n\n" ++
+            "evalFold :: (SemanticsEvaluable a, Foldable t) => Bool -> t a -> StateResult ([String], [VarType])\n" ++
+            "evalFold forwardEnv = foldlM f mempty\n" ++
+            "  where\n" ++
+            "    f (codes, ts) e = do\n" ++
+            "        env <- gets _volatileState\n" ++
+            "        ((code, env'), t) <- runEval (eval e) env\n" ++
+            "        if forwardEnv then assign volatileState env' else return ()\n" ++
+            "        return (codes ++ [code], ts ++ [t])\n\n" ++
             "runEval :: StateResult (a, b) -> VolatileState -> StateResult ((a, VolatileState), b)\n" ++
             "runEval f newVEnv = do\n" ++
             "    oldVEnv <- use volatileState\n" ++

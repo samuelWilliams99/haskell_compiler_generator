@@ -10,10 +10,9 @@ import Data.List hiding (union)
 import Data.Hashable
 import Data.Maybe
 import Data.Monoid
+import Data.Foldable
 
 
-isBaseType :: String -> Bool
-isBaseType t = elem t ["int","boolean"]
 baseTypesC :: HashMap String String
 baseTypesC = fromList [("int","int"),("boolean","int")]
 paramTypesC :: HashMap String ([String] -> String)
@@ -112,14 +111,14 @@ forceMaybe :: String -> Maybe a -> StateResult a
 forceMaybe errMsg Nothing = err errMsg
 forceMaybe _ (Just a) = return a
 
-evalFold :: (SemanticsEvaluable a) => Bool -> [a] -> StateResult ([String], [VarType])
-evalFold _ [] = return ([], [])
-evalFold forwardEnv (e:es) = do
-    env <- gets _volatileState
-    ((code, env'), t) <- runEval (eval e) env
-    if forwardEnv then assign volatileState env' else return ()
-    (codes, ts) <- evalFold forwardEnv es
-    return (code:codes, t:ts)
+evalFold :: (SemanticsEvaluable a, Foldable t) => Bool -> t a -> StateResult ([String], [VarType])
+evalFold forwardEnv = foldlM f mempty
+  where
+    f (codes, ts) e = do
+        env <- gets _volatileState
+        ((code, env'), t) <- runEval (eval e) env
+        if forwardEnv then assign volatileState env' else return ()
+        return (codes ++ [code], ts ++ [t])
 
 runEval :: StateResult (a, b) -> VolatileState -> StateResult ((a, VolatileState), b)
 runEval f newVEnv = do
