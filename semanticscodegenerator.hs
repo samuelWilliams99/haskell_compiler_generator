@@ -34,7 +34,7 @@ generateSemanticsCode :: String -- ^ Semantics module name
                       -> Maybe String -- ^ Optional additional imports
                       -> Maybe String -- ^ Optional "pre-code", a section of haskell code to be placed at the start of the file
                       -> Maybe String -- ^ Optional output "pre-code", a haskell @String@ containing C code to be placed at the start of the output C file
-                      -> SemanticsDef -- ^ The semantics definition from "semantics"
+                      -> SemanticsDef -- ^ The semantics definition from "Semantics"
                       -> String -- ^ The semantics checker code
 generateSemanticsCode name parserName imports preCode outPreCode
     (SemanticsDef baseTypes paramTypes stateExtra varExtra env _ rules astTypes) =
