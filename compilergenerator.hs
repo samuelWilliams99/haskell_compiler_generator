@@ -1,4 +1,14 @@
-module CompilerGenerator where
+{-|
+Module      : CompilerGenerator
+Description : 
+Copyright   : (c) Samuel Williams, 2021
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+
+-}
+module CompilerGenerator (runCompilerGenerator, generateCompiler, generateSemantics) where
 
 import ParserGenerator
 import System.IO
@@ -13,14 +23,10 @@ import SemanticsValidator
 import SemanticsCodeGenerator
 import MainCodeGenerator
 
--- todo
--- add a modifier for -> that allows to you have it auto increase and decrease scope before and after
--- 3 modes, non - does nothing, throwaway - increases scope for input and throws away output, keep - increase for input, decrease output and keep
--- perhaps by prefix ops like ArrowMod :: %empty | "%" | "&", so u get like cmd &-> cmdS
-
 lowerStr :: String -> String
 lowerStr = map toLower
 
+-- |
 runCompilerGenerator :: String -> IO ()
 runCompilerGenerator path = do
     let gmrPath = path ++ ".gmr"
@@ -67,6 +73,7 @@ exportsMap :: Maybe String -> Maybe String
 exportsMap Nothing = Just "IncludeMap (..), IncludeMapType (..)"
 exportsMap (Just e) = Just $ e ++ ", IncludeMap (..), IncludeMapType (..)"
 
+-- |
 generateCompiler :: String -> String -> String -> Result (String, String, String)
 generateCompiler gmr smt modulePrefix = do
     let parserModule = modulePrefix ++ "Parser"
@@ -79,6 +86,7 @@ generateCompiler gmr smt modulePrefix = do
 
     return (parserCode', semanticsCode, mainCode)
 
+-- |
 generateSemantics :: String -> String -> String -> Result (String, String, Bool)
 generateSemantics smt parserName name = do
     (ext, imports, preCode, outPreCode, semantics) <- runParser smt

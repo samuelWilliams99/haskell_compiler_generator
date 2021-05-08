@@ -1,3 +1,13 @@
+{-|
+Module      : SemanticsValidator
+Description : 
+Copyright   : (c) Samuel Williams, 2021
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+
+-}
 module SemanticsValidator (validateSemantics) where
 
 import ParserRequirements
@@ -6,6 +16,7 @@ import Data.List
 import Control.Lens
 import Data.HashMap.Strict
 
+-- |
 validateSemantics :: SemanticsDef -> Result SemanticsDef
 validateSemantics def = do
     newRules <- mapM (validateRuleTypes $ keys (_semanticsBaseTypes def)) (_semanticsRules def)

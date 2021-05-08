@@ -1,3 +1,13 @@
+{-|
+Module      : SemanticsCodeGenerator
+Description : 
+Copyright   : (c) Samuel Williams, 2021
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+
+-}
 module SemanticsCodeGenerator (generateSemanticsCode, reindent) where
 
 import Semantics
@@ -6,6 +16,7 @@ import Data.Char
 import Data.Maybe
 import Data.HashMap.Strict hiding (map, filter)
 
+-- |
 reindent :: Int -> String -> String
 reindent n str = intercalate "\n" $ map (\line -> (replicate n ' ') ++ (drop minIndent line)) strLines
   where
@@ -17,7 +28,14 @@ trim = dropWhileEnd isSpace . dropWhile isSpace
 unindent :: String -> String
 unindent = reindent 0
 
-generateSemanticsCode :: String -> String -> Maybe String -> Maybe String -> Maybe String -> SemanticsDef -> String
+-- | 
+generateSemanticsCode :: String -- ^ Semantics module name
+                      -> String -- ^ Parser module name
+                      -> Maybe String -- ^ Optional additional imports
+                      -> Maybe String -- ^ Optional "pre-code", a section of haskell code to be placed at the start of the file
+                      -> Maybe String -- ^ Optional output "pre-code", a haskell @String@ containing C code to be placed at the start of the output C file
+                      -> SemanticsDef -- ^ The semantics definition from "semantics"
+                      -> String -- ^ The semantics checker code
 generateSemanticsCode name parserName imports preCode outPreCode
     (SemanticsDef baseTypes paramTypes stateExtra varExtra env _ rules astTypes) =
     intercalate "\n\n"

@@ -1,9 +1,20 @@
+{-|
+Module      : Semantics
+Description : 
+Copyright   : (c) Samuel Williams, 2021
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+
+-}
 {-# LANGUAGE TemplateHaskell #-}
 module Semantics where
 
 import Control.Lens
 import Data.HashMap.Strict
 
+-- | 
 data SemanticsDef =
     SemanticsDef{ _semanticsBaseTypes :: HashMap String String
                 , _semanticsParamTypes :: HashMap String String
@@ -15,6 +26,7 @@ data SemanticsDef =
                 , _semanticsAstTypes :: [String]
                 } deriving Show
 
+-- | 
 data SemanticsType = SemanticsCommandType | SemanticsStaticType String | SemanticsStaticBaseType String | SemanticsVarType String deriving Eq
 
 instance Show SemanticsType where
@@ -23,6 +35,7 @@ instance Show SemanticsType where
     show (SemanticsStaticType s) = s
     show (SemanticsVarType s) = s
 
+-- |
 data SemanticsRule =
     SemanticsRule{ _semanticsRulePattern :: String
                  , _semanticsRuleOutput :: String
@@ -34,12 +47,15 @@ data SemanticsRule =
                  , _semanticsRuleTypeRestrictions :: [SemanticsTypeRestriction]
                  } deriving Show
 
+-- |
 data SemanticsTypeRestriction = SemanticsTypeRestriction{ _semanticsTypeResName :: String
                                                         , _semanticsTypeResOptions :: [String]
                                                         } deriving Show
 
+-- |
 data SemanticsRuleDependencyIterType = SemanticsDepSingle | SemanticsDepFold Bool deriving Show
 
+-- |
 data SemanticsRuleDependency = SemanticsRuleDependency{ _semanticsDepInput :: String
                                                       , _semanticsDepInputEnv :: String
                                                       , _semanticsDepOutput :: String
@@ -48,6 +64,7 @@ data SemanticsRuleDependency = SemanticsRuleDependency{ _semanticsDepInput :: St
                                                       , _semanticsDepIterType :: SemanticsRuleDependencyIterType
                                                       } deriving Show
 
+-- |
 data SemanticsDepOutputType =
     RawSemanticsDepType SemanticsType |
     BuiltSemanticsDepTypeAssign String |

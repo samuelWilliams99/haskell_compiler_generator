@@ -1,8 +1,21 @@
+{-|
+Module      : MainCodeGenerator
+Description : 
+Copyright   : (c) Samuel Williams, 2021
+License     : GPL-3
+Maintainer  : samuel.will1999@gmail.com
+Stability   : release
+
+
+-}
 module MainCodeGenerator (generateMainCode) where
 
-
-
-generateMainCode :: String -> String -> String -> Bool -> String
+-- | 
+generateMainCode :: String -- ^ Parser module name
+                 -> String -- ^ Semantics module name
+                 -> String -- ^ Input file extension
+                 -> Bool -- ^ Whether or not the generated compiler supports includes
+                 -> String -- ^ The main compiler code
 generateMainCode parserModule semanticsModule ext hasIncludes = unlines $ [
     "module Main where",
     "import System.IO",
