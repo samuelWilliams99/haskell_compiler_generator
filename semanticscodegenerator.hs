@@ -1,14 +1,15 @@
 {-|
 Module      : SemanticsCodeGenerator
-Description : 
+Description : Generates the semantics checker from the .smt file.
 Copyright   : (c) Samuel Williams, 2021
 License     : GPL-3
 Maintainer  : samuel.will1999@gmail.com
 Stability   : release
 
-
+This file takes the @SemanticsDef@ outputted by the parser after it has been validated, and generates the haskell code for the semantics checkers.
+It is responsible for setting up the environment for the reductions, and building all the error reporting mechanisms required.
 -}
-module SemanticsCodeGenerator (generateSemanticsCode, reindent) where
+module SemanticsCodeGenerator (generateSemanticsCode) where
 
 import Semantics
 import Data.List
@@ -16,7 +17,6 @@ import Data.Char
 import Data.Maybe
 import Data.HashMap.Strict hiding (map, filter)
 
--- |
 reindent :: Int -> String -> String
 reindent n str = intercalate "\n" $ map (\line -> (replicate n ' ') ++ (drop minIndent line)) strLines
   where
@@ -28,7 +28,7 @@ trim = dropWhileEnd isSpace . dropWhile isSpace
 unindent :: String -> String
 unindent = reindent 0
 
--- | 
+-- | Takes various meta information about the semantics checker, along with the @SemanticsDef@, and creates the full semantics checking file.
 generateSemanticsCode :: String -- ^ Semantics module name
                       -> String -- ^ Parser module name
                       -> Maybe String -- ^ Optional additional imports

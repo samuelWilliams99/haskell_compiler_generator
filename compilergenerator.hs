@@ -1,12 +1,14 @@
 {-|
 Module      : CompilerGenerator
-Description : 
+Description : Generates Haskell Compilers from Syntactic and Semantic definitions, stored within .gmr and .smt files.
 Copyright   : (c) Samuel Williams, 2021
 License     : GPL-3
 Maintainer  : samuel.will1999@gmail.com
 Stability   : release
 
-
+This module uses the ParserGenerator module, and as such, the .gmr file input for this module follows the same structure as that.
+Similarly to the ParserGenerator module, this module can be invoked both within haskell in a pure computation, or by command line/via an IO computation.
+The IO method of invoking the compiler generator will handle all input and output files for you, whereas using the haskell functions is a little more involved, as you are expected to correctly name the file and generate the requirements.
 -}
 module CompilerGenerator (runCompilerGenerator, generateCompiler, generateSemantics) where
 
@@ -26,7 +28,16 @@ import MainCodeGenerator
 lowerStr :: String -> String
 lowerStr = map toLower
 
--- |
+-- | This function takes a path to file with no extension, and expects a .gmr and .smt file be present. For example, calling this function with @examples/mt@ will expect that @examples/mt.gmr@ and @examples/mt.smt@ exist.
+-- The 4 files required for a compiler will be generated in the same location as the input files, named after the input files. For example, a compiler by the name @mt@ would generate the following files:
+--
+-- * @mtcompiler.hs@
+--
+-- * @mtparser.hs@
+--
+-- * @mtsemantics.hs@
+--
+-- * @parserrequirements.hs@
 runCompilerGenerator :: String -> IO ()
 runCompilerGenerator path = do
     let gmrPath = path ++ ".gmr"
@@ -73,8 +84,12 @@ exportsMap :: Maybe String -> Maybe String
 exportsMap Nothing = Just "IncludeMap (..), IncludeMapType (..)"
 exportsMap (Just e) = Just $ e ++ ", IncludeMap (..), IncludeMapType (..)"
 
--- |
-generateCompiler :: String -> String -> String -> Result (String, String, String)
+-- | Generates the code for the parser, semantics and compiler from the input definitions.
+-- This function can fail for invalid inputs.
+generateCompiler :: String -- ^ Contents of the .gmr file
+                 -> String -- ^ Contents of the .smt file
+                 -> String -- ^ Compiler name
+                 -> Result (String, String, String) -- ^ Failure-capable tuple of @(parserCode, semanticsCode, compilerCode)@
 generateCompiler gmr smt modulePrefix = do
     let parserModule = modulePrefix ++ "Parser"
     let semanticsModule = modulePrefix ++ "Semantics"
@@ -86,8 +101,11 @@ generateCompiler gmr smt modulePrefix = do
 
     return (parserCode', semanticsCode, mainCode)
 
--- |
-generateSemantics :: String -> String -> String -> Result (String, String, Bool)
+-- | Generates the semantics code from an .smt file, along with information needed to generate the main compiler file.
+generateSemantics :: String -- ^ Contents of the .smt file
+                  -> String -- ^ Module name for the parser
+                  -> String -- ^ Compiler name
+                  -> Result (String, String, Bool) -- ^ Failure-capable tuple of @(semanticsCode, fileExtension, supportsIncludesFlag)@
 generateSemantics smt parserName name = do
     (ext, imports, preCode, outPreCode, semantics) <- runParser smt
 

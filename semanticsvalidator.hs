@@ -1,12 +1,12 @@
 {-|
 Module      : SemanticsValidator
-Description : 
+Description : Ensures the @SemanticsDef@ outputted by the parser is well-formed.
 Copyright   : (c) Samuel Williams, 2021
 License     : GPL-3
 Maintainer  : samuel.will1999@gmail.com
 Stability   : release
 
-
+This file checks that any direct references to base types are valid, and performs converts the semantics rule types to actions to be taken by the code generator.
 -}
 module SemanticsValidator (validateSemantics) where
 
@@ -16,7 +16,7 @@ import Data.List
 import Control.Lens
 import Data.HashMap.Strict
 
--- |
+-- | Entry point to the validator, handles all listed above.
 validateSemantics :: SemanticsDef -> Result SemanticsDef
 validateSemantics def = do
     newRules <- mapM (validateRuleTypes $ keys (_semanticsBaseTypes def)) (_semanticsRules def)
