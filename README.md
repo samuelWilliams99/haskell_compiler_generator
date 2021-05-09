@@ -3,13 +3,13 @@ This project generates Haskell compilers from formal language definitions for sy
 
 ## Requirements
 The syntax handling for this project uses the [haskell_parser_generator](https://github.com/samuelWilliams99/haskell_parser_generator).
-You may either copy this projects source code onto your computer and use `ghc`s `-i` flag to specify its location, or install the package via `Hackage` (awaiting upload).
+You may either copy this projects source code onto your computer and use `ghc`s `-i` flag to specify its location, or install the package via `Hackage` (awaiting upload).  
 If you wish to use this project, it is highly recommended you first read the README for the parser generator.
 
 Documentation for this library has been generated using [haddock](https://www.haskell.org/haddock/). If you are modifying the documentation, and are using the parser generator library source files, please ensure that haddock does not include these files.
 
 ## Usage
-The inputs to this project are in the form of a `.gmr` file (formally defined in the readme for the parser generator) and a `.smt` file (formally defined [here](#smt-format)
+The inputs to this project are in the form of a `.gmr` file (formally defined in the readme for the parser generator) and a `.smt` file (formally defined [here](#smt-format))
 ### Compiled
 The compiled script can be run taking one argument, the path to both `gmr` and `smt` file, in the form of an extensionless path. The script will then generate the following four files, given the the input file name `NAME`:
 - `NAMEcompiler.hs`
@@ -67,7 +67,7 @@ Where, again, the extra list of Strings are the dependency directories.
 The smt file is split into the following 4 sections:
 
 ### Meta-definitions
-The meta definitions for semantics encompass not only the semantics of the language, but also information about the compiler main file, code generation, and even affect the gmr definition requirements.
+The meta definitions for semantics encompass not only the semantics of the language, but also information about the compiler main file, code generation, and even affect the gmr definition requirements.  
 There are 5 meta definitions, which are sensitive to order, but not all are required.
 - `%extension`- This directive is required and specifies the file extension for inputs to the generated compiler. This is given as a lowercase identifier and is often 1-3 characters. For example: `%extension mt`.
 - `%imports`- This directive is optional and takes a `CodeBlock` which is inserted directly after the imports section of the output file. Imports cannot be placed in the `%precode` directive below, as other code is run before it.
@@ -77,7 +77,7 @@ There are 5 meta definitions, which are sensitive to order, but not all are requ
     This would ensure all outputted C files first import the `stdio.h` library.
 - `%hasincludes`- This directive is a flag, taking no argument and altering the behaviour of the compiler simply by being present. Thus, vacuously, it is optional.
 
-By including the `%hasincludes` flag, the gmr file must specify whatever includes the parsed code has, this is done by returning a tuple of the tree and a list of import structures at the root of the gmr file, rather than just the tree.
+By including the `%hasincludes` flag, the gmr file must specify whatever includes the parsed code has, this is done by returning a tuple of the tree and a list of import structures at the root of the gmr file, rather than just the tree.  
 This is best visualised by adding an extra rule at the top of the gmr file in the following structure:
 ```
 Root :: Include* Command { (v2, v1) }
@@ -123,23 +123,23 @@ The generated semantics checker uses the \ic{StateResult} type, defined as:
 type StateResult a = StateT SemanticsState Result a
 ```
 
-Where `SemanticsState` includes the `VolatileState` (which contains the variables and functions `HashMaps` and `%stateextra` definitions), as well as the `PersistentState`, used for tracking information like a unique name counter.
+Where `SemanticsState` includes the `VolatileState` (which contains the variables and functions `HashMaps` and `%stateextra` definitions), as well as the `PersistentState`, used for tracking information like a unique name counter.  
 `Result` here is effectively a `Maybe` monad with an error string.
 
 When building the default environment, you will define a function of type `StateResult a`, where `a`, the return type, is discarded. You will then use the helper functions defined [here](#environment-functions) and the function `modEnv`, to setup variables and functions. The `modEnv` function is used to directly modify the current volatile state, rather than the globally defined `env` variable they are intended for, when used for the reductions.
 
 With the environment defined, we can specify the 3 directives, order sensitive:
-- `%stateextra` - Specifies the data type of an extra field on the state. It is required that this data type is an instance of `Monoid`, for the initial state and for state merging with includes (regardless of whether the language actually supports includes).
+- `%stateextra` - Specifies the data type of an extra field on the state. It is required that this data type is an instance of `Monoid`, for the initial state and for state merging with includes (regardless of whether the language actually supports includes).  
 This directive is optional and defaults to `()`.
 
-- `%varextra` - Specifies the data type of an extra field on variables, specifically those used in the variables `HashMap` on the state. There are no instance requirements on this type, as you are required to supply it when you add variables to the environment.
+- `%varextra` - Specifies the data type of an extra field on variables, specifically those used in the variables `HashMap` on the state. There are no instance requirements on this type, as you are required to supply it when you add variables to the environment.  
 Similar to `%stateextra`, this directive defaults to `()`.
 
-- `%standardenv` - Takes a function of type `StateResult a`, as discussed above. The function can be defined as a lowercase identifier or a `CodeBlock`.
+- `%standardenv` - Takes a function of type `StateResult a`, as discussed above. The function can be defined as a lowercase identifier or a `CodeBlock`.  
 This directive is optional, and defaults to an empty environment.
 
 ### Reductions
-The rest of the smt file is dedicated to defining the reductions. These are semantic reductions for structures outputted by the parser, and define code generation, output types, and any dependency before said reduction can pass.
+The rest of the smt file is dedicated to defining the reductions. These are semantic reductions for structures outputted by the parser, and define code generation, output types, and any dependency before said reduction can pass.  
 Reductions are defined in groups, by the ddata type of the input. This is specified using the `%asttype` directive, which should be called before each group of reductions with the data type they are reducing.
 
 The minimum requirements for a reduction are as follows:
@@ -152,7 +152,7 @@ Using only the above features, axiom reductions can be defined, as such:
 ```
 case { ASTExprInt x ps } -> { cInt x } @ "int"
 ```
-Each reduction must start with the `case` keyword, followed by the input pattern, an arrow `->`, the output code (in this case we are using the `cInt` preset function, see [here](#c-code-generation-presets)), and lastly the type, preceeded by a `@`.
+Each reduction must start with the `case` keyword, followed by the input pattern, an arrow `->`, the output code (in this case we are using the `cInt` preset function, see [here](#c-code-generation-presets)), and lastly the type, preceeded by a `@`.  
 This example axiom says that literal integers in the input language are treated as the base type "int" in semantics.
 
 If we wish to alter the output environment for this reduction, we must use the `~` character, followed by the name of a new `VolatileEnvironment`, as such:
@@ -161,7 +161,7 @@ case { ASTExprInt x ps } -> { cInt x } ~ env' @ "int"
 ```
 Note that the environment should always come before the type.
 
-To define non-axiom reductions, we need a way to reduce parts of the input token before finishing the current reduction. This is done using the `evaluating` section.
+To define non-axiom reductions, we need a way to reduce parts of the input token before finishing the current reduction. This is done using the `evaluating` section.  
 The `evaluation` section should contain a list of dependency reduction, defined in the following format:
 ```
 inputEvaluable ~ inputEnv -> outputCode ~ newEnv @ "expectedType"
