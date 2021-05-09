@@ -54,7 +54,8 @@ generateSemanticsCode name parserName imports preCode outPreCode
         ]
 
 generateModuleCode :: String -> String
-generateModuleCode name = "module " ++ name ++
+generateModuleCode name = "{-# LANGUAGE TemplateHaskell #-}\n" ++
+    "module " ++ name ++
     " (runSemantics, rDefaultState, _outPreCode, indent, " ++
     "VolatileState (..), PersistentState (..), SemanticsState (..), Var (..)) where"
 
