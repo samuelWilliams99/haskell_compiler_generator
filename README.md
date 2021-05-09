@@ -3,7 +3,8 @@ This project generates Haskell compilers from formal language definitions for sy
 
 ## Requirements
 The syntax handling for this project uses the [haskell_parser_generator](https://github.com/samuelWilliams99/haskell_parser_generator).
-You may either copy this projects source code onto your computer and use `ghc`s `-i` flag to specify its location, or install the package via `Hackage` (awaiting upload)
+You may either copy this projects source code onto your computer and use `ghc`s `-i` flag to specify its location, or install the package via `Hackage` (awaiting upload).
+If you wish to use this project, it is highly recommended you first read the README for the parser generator.
 
 Documentation for this library has been generated using [haddock](https://www.haskell.org/haddock/). If you are modifying the documentation, and are using the parser generator library source files, please ensure that haddock does not include these files.
 
@@ -138,6 +139,51 @@ Similar to `%stateextra`, this directive defaults to `()`.
 This directive is optional, and defaults to an empty environment.
 
 ### Reductions
+The rest of the smt file is dedicated to defining the reductions. These are semantic reductions for structures outputted by the parser, and define code generation, output types, and any dependency before said reduction can pass.
+Reductions are defined in groups, by the ddata type of the input. This is specified using the `%asttype` directive, which should be called before each group of reductions with the data type they are reducing.
+
+The minimum requirements for a reduction are as follows:
+- The input pattern, matching a constructor for the current `%asttype`.
+It is required that the pattern defines `ps` as a `ParseState` (see the parser generator documentation for more information about this), this will normally be the `ParseState` in each of the AST constructors defined in the gmr file. For example: `{ ASTExprInt x ps }`.
+- The output code, this will be the Haskell code to generate the relevant C code for this reduction, there are several presets for code generation to minimise the required knowledge of C.
+- The output type, this will be the type of this expression or command. If the output type is not specified, it will default to a `CommandType`. If it is a string literal, it will be wrapped as a `BaseType` of that string. Otherwise, if a `CodeBlock` is used, you are expected to return a `VarType` object.
+
+Using only the above features, axiom reductions can be defined, as such:
+```
+case { ASTExprInt x ps } -> { cInt x } @ "int"
+```
+Each reduction must start with the `case` keyword, followed by the input pattern, an arrow `->`, the output code (in this case we are using the `cInt` preset function, see [here](#c-code-generation-presets)), and lastly the type, preceeded by a `@`.
+This example axiom says that literal integers in the input language are treated as the base type "int" in semantics.
+
+If we wish to alter the output environment for this reduction, we must use the `~` character, followed by the name of a new `VolatileEnvironment`, as such:
+```
+case { ASTExprInt x ps } -> { cInt x } ~ env' @ "int"
+```
+Note that the environment should always come before the type.
+
+To define non-axiom reductions, we need a way to reduce parts of the input token before finishing the current reduction. This is done using the `evaluating` section.
+The `evaluation` section should contain a list of dependency reduction, defined in the following format:
+```
+inputEvaluable ~ inputEnv -> outputCode ~ newEnv @ "expectedType"
+```
+The `inputEvaluable` here is expected to either be one of the `%asttype` data structures, or a `Foldable` of one of these structures.  
+The `inputEnv` and `newEnv` parameters are optional, simply omit the identifier and the `~` if you wish not to specify. Leaving the input environment blank will default it to the current environment, denoted by the pre-defined `env` variable. Leaving the output environment blank will simply discard this environment.  
+The `->` defined the type of reduction to perform. For single evalable structures, such as in the example, the default `->` should be used. However, if `inputEvaluable` is a `Foldable` of evaluables, the `*->` or `^->` arrow should be used. The `*->` arrow will pass the same environment to the reduction of each of the contained evaluables, whereas the `^->` arrow will propagate the changes to the environment while folding over the structure.  
+Lastly, `expectedType` here is formatted the same as with the output type for the containing reduction, where the expected type will be compared to the real type, and error if they are different. There is one addition however, if you use a normal identifier for the type, rather than a string literal or codeblock, the output type of the dependency will be assigned to that name for use later. Reuse of the same identifier for several dependencies will ensure equality of the output types for these dependencies.
+
+Note here that both `inputEvaluable` and `inputEnv` can be `CodeBlocks`, allowing you to generate the value required with haskell code inline.
+
+When using identifier types, you can use the `restricting` section to ensure enforce their value, as follows:
+```
+evaluating
+    val1 -> val1S @ valType
+    val2 -> val2S @ valType
+restricting
+    valType to int, boolean
+```
+This ensures both `val1` and `val2` reduce to the same type (as discussed above), but then also enforces this type to be either an `int` or `boolean`, which are both base types in this hypothetical language.
+
+Finally, the last section we can define on a reduction is the `where` section, which takes a `CodeBlock` and runs within the reduction (a `StateResult` computation). This is used to manipulate the environment and enforce custom requirements on the input. The list of functions you can use in this section are listed in the section below.
 
 ### Environment functions
 There are two types of environment functions, those that change the environment and those that simply read from it. To ease explanation of these functions, we will use the `VolatileStateMap` type, defined as follows:
@@ -150,10 +196,35 @@ Lastly, we have a set of functions for dealing with failure.
 These functions are listed and explained below:
 
 #### Environment Manipulators
+- `increaseScope :: VolatileStateMap` - Increase an environments scope, new variables defined from here will be created in this scope.
+- `decreaseScope :: VolatileStateMap` - Decreases the environment scope, any functions or variables defined in the old scope will be removed.
+- `modifyVar :: Var VarExtra -> (Var VarExtra -> Var VarExtra) -> VolatileStateMap` - Maps a function onto a variable in the environment.
+- `addStaticFunc :: String -> [VarType] -> VarType -> String -> VolatileStateMap` - Adds a static function to the environment.
+  ```
+  addStaticFunc name argTypes returnType cFunction env
+  ```
+- `addVarFunc :: String -> [VarType] -> VarType -> VarExtra -> String -> VolatileStateMap` - Adds a variable with the function type to the environment
+  ```
+  addVarFunc name argTypes returnType () cFunction env
+  ```
+- `addVar :: String -> VarExtra -> VarType -> VolatileState -> StateResult (Var VarExtra, VolatileState)` - Adds a generic variable to the environment, returns the variable object.
+  ```
+  addVar name () varType env
+  ```
 
+Normally in our reductions, we pass the environment around ourselves, however when building the standard environment, this gets rather tedious. Instead, the `modEnv` function is implemented, which simply takes a `VolatileStateMap` and applies it to the current State. This should only be used for creating the standard environment, and not in `where` clauses of reductions.
+```
+modEnv :: VolatileStateMap -> StateResult ()
+```
 #### Environment Accessors
+- `getVar :: String -> VolatileState -> Maybe (Var VarExtra)` - Gets a variable by name, picks the variable with the highest scope, or gives nothing if no variable exists.
+- `getStaticFunc :: String -> [VarType] -> VolatileState -> Maybe (Var ())` - Gets a static function by name and arguments.
+- `getVarFunc :: String -> VolatileState -> Maybe (Var VarExtra, [VarType], VarType)` - Gets a variable function by name, also returns argument and return types.
 
 #### Failure functions
+- `err :: String -> StateResult a` - Simply errors, the error message passed in will have the source position added to it, along with the file path if `%hasincludes` is present.
+- `require :: String -> Bool -> StateResult ()` - Takes an error and a boolean, errors if the boolean is false with the given error message.
+- `forceMaybe :: String -> Maybe a -> StateResult a` - Takes a `Maybe` value, and returns its contents if it is `Just a`, or errors with given error message if it is `Nothing`.
 
 ### C Code Generation Presets
 Following is a list of C-preset code generators, all returning strings.
