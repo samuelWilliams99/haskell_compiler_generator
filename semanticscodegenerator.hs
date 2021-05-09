@@ -250,7 +250,7 @@ cPresetsCode = "cBinOp :: String -> String -> String -> String\n" ++
                "cFor v init cond step cmd = \"for(\" ++ cCreateVar v (Just init) ++ \"; \" ++ cond ++ \"; \" ++ step ++ \")\" ++ cBlock cmd\n" ++
                "cSimpleFor :: Var a -> String -> String -> String -> String -> String\n" ++
                "cSimpleFor v init limit step cmd = cBlock $ \"int limit = \" ++ limit ++ \";\\n\" ++\n" ++
-               "                                            cFor v init \"limit\" (cVar v ++ \" += \" ++ step) cmd\n"
+               "                                            cFor v init (cVar v ++ \"< limit\") (cVar v ++ \" += \" ++ step) cmd\n"
 
 astFuncName :: String -> String
 astFuncName t = "generateCode" ++ t
