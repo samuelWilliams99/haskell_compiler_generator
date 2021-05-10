@@ -19,6 +19,7 @@ import System.Environment
 import System.FilePath.Posix
 import Data.Char
 import Data.Maybe
+import Data.List
 import Semanticsparser
 import Semantics
 import SemanticsValidator
@@ -85,9 +86,12 @@ includeMapsCode = unlines [
     "rename ns = IncludeMap (IncludeMapRename ns) Nothing"
     ]
 
-exportsMap :: Maybe String -> Maybe String
-exportsMap Nothing = Just "IncludeMap (..), IncludeMapType (..)"
-exportsMap (Just e) = Just $ e ++ ", IncludeMap (..), IncludeMapType (..)"
+formaliseExports :: [String] -> String
+formaliseExports es = intercalate ", " $ fmap (++( " (..)")) es
+
+addExports :: [String] -> Maybe String -> Maybe String
+addExports es Nothing = Just $ formaliseExports es
+addExports es (Just e) = Just $ e ++ ", " ++ formaliseExports es
 
 -- | Generates the code for the parser, semantics and compiler from the input definitions.
 -- This function can fail for invalid inputs.
@@ -98,8 +102,12 @@ generateCompiler :: String -- ^ Contents of the .gmr file
 generateCompiler gmr smt modulePrefix = do
     let parserModule = modulePrefix ++ "Parser"
     let semanticsModule = modulePrefix ++ "Semantics"
-    (semanticsCode, ext, hasIncludes) <- generateSemantics smt parserModule semanticsModule
-    parserCode <- eitherToResult $ generateParser gmr parserModule $ if hasIncludes then exportsMap else id
+    (semanticsCode, ext, semantics) <- generateSemantics smt parserModule semanticsModule
+    let hasIncludes = _semanticsHasIncludes semantics
+    let asttypes = _semanticsAstTypes semantics
+    let exports = asttypes ++ if hasIncludes then ["IncludeMap", "IncludeMapType"] else []
+
+    parserCode <- eitherToResult $ generateParser gmr parserModule $ addExports exports
     let mainCode = generateMainCode parserModule semanticsModule ext hasIncludes
 
     let parserCode' = if hasIncludes then parserCode ++ "\n\n" ++ includeMapsCode else parserCode
@@ -110,7 +118,7 @@ generateCompiler gmr smt modulePrefix = do
 generateSemantics :: String -- ^ Contents of the .smt file
                   -> String -- ^ Module name for the parser
                   -> String -- ^ Compiler name
-                  -> Result (String, String, Bool) -- ^ Failure-capable tuple of @(semanticsCode, fileExtension, supportsIncludesFlag)@
+                  -> Result (String, String, SemanticsDef) -- ^ Failure-capable tuple of @(semanticsCode, fileExtension, semantics)@
 generateSemantics smt parserName name = do
     (ext, imports, preCode, outPreCode, semantics) <- runParser smt
 
@@ -118,4 +126,4 @@ generateSemantics smt parserName name = do
 
     let code = generateSemanticsCode name parserName imports preCode outPreCode validatedSemantics
 
-    return (code, ext, _semanticsHasIncludes semantics)
+    return (code, ext, semantics)
