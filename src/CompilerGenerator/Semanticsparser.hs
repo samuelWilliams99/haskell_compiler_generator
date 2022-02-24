@@ -2,15 +2,15 @@
 Module      : Semanticsparser
 Description : Parser generated with the Haskell Parser Generator - https://github.com/samuelWilliams99/haskell_parser_generator
 -}
-module Semanticsparser (runParser, module ParserRequirements) where
+module CompilerGenerator.Semanticsparser (runParser, module CompilerGenerator.ParserRequirements) where
 
 
-import ParserRequirements
+import CompilerGenerator.ParserRequirements
 import Control.Applicative
 import Data.Maybe
 import Data.Either
 import Data.List
-import Semantics
+import CompilerGenerator.Semantics
 import Control.Arrow
 import Data.HashMap.Strict hiding (empty, union)
 handleStatements :: [Either SemanticsRule String] -> ([SemanticsRule], [String])

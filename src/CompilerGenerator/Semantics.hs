@@ -10,7 +10,7 @@ This module creates lenses for all constructors within the data types.
 The structures within this file are outputted by the .smt parser, and directly used to generate the semantics checker.
 -}
 {-# LANGUAGE TemplateHaskell #-}
-module Semantics where
+module CompilerGenerator.Semantics where
 
 import Control.Lens
 import Data.HashMap.Strict

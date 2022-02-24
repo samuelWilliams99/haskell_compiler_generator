@@ -20,19 +20,14 @@ import System.FilePath.Posix
 import Data.Char
 import Data.Maybe
 import Data.List
-import Semanticsparser
-import Semantics
-import SemanticsValidator
-import SemanticsCodeGenerator
-import MainCodeGenerator
+import CompilerGenerator.Semanticsparser
+import CompilerGenerator.Semantics
+import CompilerGenerator.SemanticsValidator
+import CompilerGenerator.SemanticsCodeGenerator
+import CompilerGenerator.MainCodeGenerator
 
 lowerStr :: String -> String
 lowerStr = map toLower
-
-main :: IO ()
-main = do
-    args <- getArgs
-    runCompilerGenerator $ head args
 
 -- | This function takes a path to file with no extension, and expects a .gmr and .smt file be present. For example, calling this function with @examples/mt@ will expect that @examples/mt.gmr@ and @examples/mt.smt@ exist.
 -- The 4 files required for a compiler will be generated in the same location as the input files, named after the input files. For example, a compiler by the name @mt@ would generate the following files:

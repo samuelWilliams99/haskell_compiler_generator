@@ -8,10 +8,10 @@ Stability   : release
 
 This file checks that any direct references to base types are valid, and performs converts the semantics rule types to actions to be taken by the code generator.
 -}
-module SemanticsValidator (validateSemantics) where
+module CompilerGenerator.SemanticsValidator (validateSemantics) where
 
-import ParserRequirements
-import Semantics
+import CompilerGenerator.ParserRequirements
+import CompilerGenerator.Semantics
 import Data.List
 import Control.Lens
 import Data.HashMap.Strict

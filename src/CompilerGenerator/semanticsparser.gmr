@@ -2,7 +2,7 @@
 import Data.Maybe
 import Data.Either
 import Data.List
-import Semantics
+import CompilerGenerator.Semantics
 import Control.Arrow
 import Data.HashMap.Strict hiding (empty, union)
 

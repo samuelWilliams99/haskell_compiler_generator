@@ -9,9 +9,9 @@ Stability   : release
 This file takes the @SemanticsDef@ outputted by the parser after it has been validated, and generates the haskell code for the semantics checkers.
 It is responsible for setting up the environment for the reductions, and building all the error reporting mechanisms required.
 -}
-module SemanticsCodeGenerator (generateSemanticsCode) where
+module CompilerGenerator.SemanticsCodeGenerator (generateSemanticsCode) where
 
-import Semantics
+import CompilerGenerator.Semantics
 import Data.List
 import Data.Char
 import Data.Maybe

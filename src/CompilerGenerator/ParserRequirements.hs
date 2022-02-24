@@ -20,7 +20,7 @@ This module is copied to any generated parser and contains 5 sections of code:
   [@languageDefsParser@] A set of @Parser@s specifically for the gmr file, and any other similar meta-languages
 
 -}
-module ParserRequirements (
+module CompilerGenerator.ParserRequirements (
 -- * ParseState
 ParseState (..),
 showPos,

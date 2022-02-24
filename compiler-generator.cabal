@@ -1,0 +1,75 @@
+cabal-version:      2.4
+name:               compiler-generator
+version:            0.1.0.0
+
+-- A short (one-line) description of the package.
+-- synopsis:
+
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
+
+-- The license under which the package is released.
+-- license:
+author:             Samuel Williams
+maintainer:         33094920+samuelWilliams99@users.noreply.github.com
+
+-- A copyright notice.
+-- copyright:
+-- category:
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+library
+    exposed-modules:
+      CompilerGenerator 
+
+    other-modules:
+      CompilerGenerator.MainCodeGenerator
+      CompilerGenerator.ParserRequirements
+      CompilerGenerator.Semantics
+      CompilerGenerator.SemanticsCodeGenerator
+      CompilerGenerator.Semanticsparser
+      CompilerGenerator.SemanticsValidator
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:
+      , base ^>=4.16.0.0
+      , parser-generator
+      , unordered-containers
+      , hashable
+      , lens
+      , mtl
+      , split
+      , transformers
+      , safe
+      , directory
+      , filepath
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable compiler-generator-exe
+    main-is:          Main.hs
+
+    -- Modules included in this executable, other than Main.
+    -- other-modules:
+
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    build-depends:
+      , base ^>=4.16.0.0
+      , compiler-generator
+      , unordered-containers
+      , hashable
+      , lens
+      , mtl
+      , split
+      , transformers
+      , safe
+      , directory
+    hs-source-dirs:   app
+    default-language: Haskell2010
